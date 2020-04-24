@@ -151,7 +151,7 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
 
   fun is_member(a: A, v: B): Bool =>
     """
-    Checks if element exists within the sequence.
+    Checks if element exists within the `sequence`.
 
     ````pony
     Seqs[Array[I32], I32].is_member?(1; 2; 3; 4; 5; 6; 7; 8; 9; 10, 5)
@@ -191,9 +191,61 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     try out.push(a(0)?) end
     out
 
+  fun first(a: A): A^ =>
+    """
+    Extract the first element of a `sequence` (zero-based).
+
+    ````pony
+    Seqs.first([1; 2; 3; 4; 5])
+    [1]
+
+    Seqs.first([])
+    []
+    ````
+    """
+    let out = a.create()
+    try out.push(a(a.size()-1)?) end
+    out
+
+  fun second(a: A): A^ =>
+    """
+    Extract the first element of a `sequence` (zero-based).
+
+    ````pony
+    Seqs.second([1; 2; 3; 4; 5])
+    [2]
+
+    Seqs.second([])
+    []
+    ````
+    """
+    let out = a.create()
+    try out.push(a(1)?) end
+    out
+
+  fun nth(a: A, index: ISize): A^ =>
+    """
+    Extract the nth element of a `sequence` (zero-based).
+
+    ````pony
+    Seqs.nth([1; 2; 3; 4; 5], 3)
+    [4]
+
+    Seqs.nth([1; 2; 3; 4; 5;], -1)
+    [5]
+    ````
+    """
+    let i' = if (index + a.size().isize_unsafe()) < 0 then 0 else index.usize_unsafe() end
+    let i'': USize = if i' > a.size() then a.size() else i' end
+
+    let i: USize = (i'' + a.size()) %% a.size()
+    let out = a.create()
+    try out.push(a(i)?) end
+    out
+
   fun last(a: A): A^ =>
     """
-    Extract the last element of a list (zero-based).
+    Extract the last element of a `sequence` (zero-based).
 
     ````pony
     Seqs.last([1; 2; 3; 4; 5])
@@ -591,38 +643,12 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     end
     out
 
-  fun take_every(a: A, nth: USize): A^ =>
-    """
-    Returns a list of every nth element in the sequence, starting with the
-    first element.
-
-    ````pony
-    Seqs.take_every([1; 2; 3; 4; 5; 6; 7; 8; 9; 10], 2)
-    [1; 3; 5; 7; 9]
-
-    Seqs.take_every([1; 2; 3; 4; 5], 0)
-    []
-
-    Seqs.take_every([1; 2; 3], 1)
-    [1; 2; 3]
-    ````
-    """
-    let out = a.create()
-    for i in Range[USize](0, a.size()) do
-      if (i %% nth) == 0 then
-        try out.push(a.shift()?) end
-      end
-    end
-    out
-
   fun take_random(a: A, n: USize): A^ =>
     """
     Takes n random elements from sequence.
-
     ````pony
     Seqs[Array[U32], U32].take_random(Num[U32].range_i(1, 10), 2)
     [7; 2]
-
     let arr = Num[U32].range_i('a', 'z')
     let str: String ref = String.from_array(arr).string()
     Seqs[String ref, U8].take_random(str, 5)
@@ -643,7 +669,6 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     Takes the elements from the beginning of the sequence while fun returns a
     truthy value.
-
     ````pony
     Seqs.take_while([1; 2; 3; 4; 5; 1; 0;], {(B): Bool} => x<3))
     [1; 2]
@@ -661,11 +686,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     Given a sequence of sequences, concatenates the sequences into a single
     list.
-
     ````pony
     Seqs.concat([[1; 2; 3]; [4; 5; 6]; [7; 8; 9])
     [1; 2; 3; 4; 5; 6; 7; 8; 9]
-
     Seqs.concat([[1; [2]; 3]; [4]; [5; 6]])
     [1; [2]; 3; 4; 5; 6]
     ````
@@ -683,11 +706,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
   fun concat2(left: A, right: A) =>
     """
     Concatenates the sequence on the right with the sequence on the left.
-
     ````pony
     Seqs.concat2([1; 2; 3], [4; 5; 6])
     [1; 2; 3; 4; 5; 6]
-
     Seqs.concat2([1; 2; 3], [4; 5; 6])
     [1; 2; 3; 4; 5; 6]
     ````
@@ -699,7 +720,6 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
   fun sum(a: A, f_add: {(B, B): B}): B? =>
     """
     Returns the sum of all elements.
-
     ````pony
     Seqs[Array[I32], I32].sum([1; 2; 3])
     6
@@ -716,11 +736,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     Traverse the sequence, returning a list where all consecutive
     duplicated elements are collapsed to a single element.
-
     ````pony
     Seqs[Array[U32], U32].dedup([1; 2; 3; 3; 2; 1])
     [1; 2; 3; 2; 1]
-
     Seqs[Array[(U32|F32|String)], (U32|F32|String)].dedup([1; 1; 2; 2.0; "three"; "three"])
     [1; 2; 2.0; "three"]
     ````
@@ -742,11 +760,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     Traverse the sequence, returning a list where all consecutive duplicated
     elements are collapsed to a single element.
-
     ````pony
     Seqs[Array[U32], U32].dedup_by([(1, "a"), (2, "b"), (2, "c"), (1, "a")], {(x: B): Any => x._1})
     [(1, "a"), (2, "b"), (1, "a")]
-
     Seqs[Array[U32], U32].dedup_by([5, 1, 2, 3, 2, 1], {(x: U32): Any => x})
     [5, 1, 3, 2]
     ````
@@ -766,11 +782,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
   fun drop(a: A, amount: USize): A^ =>
     """
     Drops the amount of elements from the sequence.
-
     ````pony
     Seqs.dedup_by([(1, "a"), (2, "b"), (2, "c"), (1, "a")], (x, _) -> x end)
     [(1, "a"), (2, "b"), (1, "a")]
-
     Seqs.dedup_by({5, 1, 2, 3, 2, }], fn x -> x > 2 end)
     {5, 1, 3, 2}
     ````
@@ -785,17 +799,13 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
   fun drop_tail(a: A, amount: USize): A^ =>
     """
     Drops the amount of elements from the sequence.
-
     ````pony
     Seqs.drop([1; 2; 3], 2)
     [3]
-
     Seqs.drop([1; 2; 3], 10)
     []
-
     Seqs.drop([1; 2; 3], 0)
     [1; 2; 3]
-
     Seqs.drop([1; 2; 3], -1)
     [1; 2]
     ````
@@ -807,9 +817,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     end
     a
 
-  fun drop_every(a: A, nth: USize): A^ =>
+  fun take_every(a: A, nth': USize): A^ =>
     """
-    Returns a list of every nth element in the sequence dropped,
+    Returns a list of every nth' element in the sequence dropped,
     starting with the first element.
 
     ````pony
@@ -824,7 +834,7 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     ````
     """
     for i in Range[USize](0, a.size()) do
-      if (i %% nth) == 0 then remove(a, i) end
+      if (i %% nth') == 0 then remove(a, i) end
     end
     a
 
@@ -1081,7 +1091,7 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     Seqs.join([1; 2; 3])
     "123"
 
-    Enum.join([1; 2; 3], " = ")
+    Seqs.join([1; 2; 3], " = ")
     "1 = 2 = 3"
     ````
     See also: `map_join`
@@ -1125,9 +1135,9 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     end
     a
 
-  fun map_every(a: A, nth: USize, f: {(B): B}): A^ =>
+  fun map_every(a: A, nth': USize, f: {(B): B}): A^ =>
     """
-    Returns a list of results of invoking fun on every nth element of
+    Returns a list of results of invoking fun on every nth' element of
     sequence, starting with the first element.
     ````pony
     Seqs.map_every([1..10], 2, {(x: U32): U32 => x + 1000})
@@ -1145,7 +1155,7 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     var i: USize = 0
     for e in a.values() do
-      if (i %% nth) == 0 then
+      if (i %% nth') == 0 then
         try a(i)?= f(e) end
       end
       i = i + 1
@@ -1438,7 +1448,7 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     Converts sequence to a list.
 
     ````pony
-    Seqs.to_list({1, 2, 3})
+    Seqs.to_array({1, 2, 3})
     [1; 2; 3]
     ````
     """

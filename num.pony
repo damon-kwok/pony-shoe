@@ -31,7 +31,8 @@ use "collections"
 
 primitive Num[A: (Real[A] val & Number) = ISize]
   fun inc(a: A): A =>
-                
+    if a == A.max_value() then a else a+1 end
+
   fun range(from: A, to: A): Array[A]^ =>
     let out = Array[A]
     // for i in Range[A](from, to) do
