@@ -34,8 +34,7 @@ Seqs.swap([2; 3; 1; 5], 0, 2)
 Seqs.sort([2; 3; 1])
 [1; 2; 3]
 
-Seqs[Array[String], String].sort_by(["some"; "kind"; "of"; "monster"],
-                 {(a: String, b: String): Bool => a.size() > b.size()})
+Seqs.sort_by(["some"; "kind"; "of"; "monster"], {(x: String): USize => x.size()})
 ["of"; "some"; "kind"; "monster"]
 
 Seqs.rotation([1; 2; 3; 4; 5; 6; 7], 1)

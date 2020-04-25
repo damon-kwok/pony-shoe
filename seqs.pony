@@ -46,8 +46,8 @@ primitive HashSeqs[A: Seq[B] ref = Array[USize],
     count of every element.
 
     ````pony
-    Seqs.frequencies("ant buffalo ant ant buffalo dingo")
-    // {1 => "dingo" , 2 => "buffalo", 3 => "ant"}
+    let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
+    Seqs.frequencies(arr)
     {"ant" => 3, "buffalo" => 2, "dingo" => 1}
     """
     var m = Map[B, USize]
@@ -61,8 +61,9 @@ primitive HashSeqs[A: Seq[B] ref = Array[USize],
     Returns a map with keys as unique elements given by key_fun and values as the count of every element.
 
     ````pony
-    Seqs.frequencies("ant buffalo ant ant buffalo dingo", {(i: USize): USize => i})
-    {3 => "ant", 2 => "buffalo", 1 => "dingo"}
+    let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
+    Seqs.frequencies(arr, {(i: USize): USize => i})
+    {"ant" => 3, "buffalo" => 2, "dingo" => 1}
     ````
     """
     var m = Map[B, USize]
@@ -76,12 +77,14 @@ primitive HashSeqs[A: Seq[B] ref = Array[USize],
     """
     Splits the sequence into groups based on key_fun.
     ````pony
-    let arr = "ant buffalo cat dingo".split(" ")
-    Enum.group_by(arr, {(B): B => })
-    %{3 => ["ant", "cat"], 5 => ["dingo"], 7 => ["buffalo"]}
+    let arr = Str.split("ant buffalo cat dingo"," ")
+    Seqs.group_by(arr, {(B): B => })
+    {3 => ["ant", "cat"], 5 => ["dingo"], 7 => ["buffalo"]}
 
-    Enum.group_by(~w{ant buffalo cat dingo}, &String.length/1, &String.first/1)
-    %{3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
+    Seqs.group_by(~w{ant buffalo cat dingo},
+          {(x:String):String=>x.size().string()},
+          {(x:String):String=>x.(0)})
+    {3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
     ````
     """
     var m = Map[B, A]
@@ -238,73 +241,56 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     end
     false
 
-  fun first(a: A): A^ =>
+  fun first(a: A): B? =>
     """
     Extract the first element of a `sequence` (zero-based).
 
     ````pony
     Seqs.first([1; 2; 3; 4; 5])
-    [1]
-
-    Seqs.first([])
-    []
+    1
     ````
     """
-    let out = a.create()
-    try out.push(a(a.size()-1)?) end
-    out
+    a(0)?
 
-  fun second(a: A): A^ =>
+  fun second(a: A): B? =>
     """
     Extract the first element of a `sequence` (zero-based).
 
     ````pony
     Seqs.second([1; 2; 3; 4; 5])
-    [2]
-
-    Seqs.second([])
-    []
+    2
     ````
     """
-    let out = a.create()
-    try out.push(a(1)?) end
-    out
+    a(1)?
 
-  fun nth(a: A, index: ISize): A^ =>
+  fun nth(a: A, index: ISize): B? =>
     """
     Extract the nth element of a `sequence` (zero-based).
 
     ````pony
     Seqs.nth([1; 2; 3; 4; 5], 3)
-    [4]
+    4
 
     Seqs.nth([1; 2; 3; 4; 5;], -1)
-    [5]
+    5
     ````
     """
     let i' = if (index + a.size().isize_unsafe()) < 0 then 0 else index.usize_unsafe() end
     let i'': USize = if i' > a.size() then a.size() else i' end
 
     let i: USize = (i'' + a.size()) %% a.size()
-    let out = a.create()
-    try out.push(a(i)?) end
-    out
+    a(i)?
 
-  fun last(a: A): A^ =>
+  fun last(a: A): B^? =>
     """
     Extract the last element of a `sequence` (zero-based).
 
     ````pony
     Seqs.last([1; 2; 3; 4; 5])
-    [5]
-
-    Seqs.last([])
-    []
+    5
     ````
     """
-    let out = a.create()
-    try out.push(a(a.size()-1)?) end
-    out
+    a(a.size()-1)?
 
   fun head(a: A): A^ =>
     """
@@ -338,7 +324,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     try out.shift()? end
     out
 
-  fun at(a: A, i: USize, default: B): B =>
+  fun at(a: A, index: ISize, default: B): B =>
     """
     Finds the element at the given index (zero-based).
 
@@ -346,18 +332,18 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     Seqs.at([2; 4; 6], 0, -1)
     2
 
-    Seqs.at([2; 4; 6], 2, -1)
+    Seqs.at([2; 4; 6], -1, -1)
     6
 
     Seqs.at([2; 4; 6], 4, -1)
-    -1
+    0
     ````
     """
-    try
-      a(i)?
-    else
-      default
-    end
+    let i' = if (index + a.size().isize_unsafe()) < 0 then 0 else index.usize_unsafe() end
+    let i'': USize = if i' > a.size() then a.size() else i' end
+
+    let i: USize = (i'' + a.size()) %% a.size()
+    try a(i)? else default end
 
   fun fetch(a: A, i: USize): B? =>
     """
@@ -775,15 +761,15 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     arr.clear()
     out
 
-  fun concat2(left: A, right: A) =>
+  fun merge(left: A, right: A) =>
     """
     Concatenates the sequence on the right with the sequence on the left.
 
     ````pony
-    Seqs.concat2([1; 2; 3], [4; 5; 6])
+    Seqs.merge([1; 2; 3], [4; 5; 6])
     [1; 2; 3; 4; 5; 6]
 
-    Seqs.concat2([1; 2; 3], [4; 5; 6])
+    Seqs.merge([1; 2; 3], [4; 5; 6])
     [1; 2; 3; 4; 5; 6]
     ````
     """
@@ -1108,30 +1094,6 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     end
     a
 
-  // fun with_index(a: A, offset: USize = 0): Seq[(B, USize)] =>
-    // """
-    // Returns the sequence with each element wrapped in a tuple alongside its
-    // index.
-    // ````pony
-    // Seqs[Array[String], String].with_index(["a"; "b"; "c"])
-    // [("a", 0); ("b", 1); ("c", 2)]
-
-    // Seqs[List[String], String].with_index({"a", "b", "c"}, 3)
-    // {("a", 3); ("b", 4); ("c", 5)}
-    // ````
-    // """
-    // var out: Seq[(B, USize)]
-    // let t = typeof(a)
-    // match t
-      // | ListType => List[(B, USize)](0)
-      // | ArrayType => List[(B, USize)](0)
-      // | StringType => "".string()
-    // end
-    // for i in Range[USize](0, a.size()) do
-      // try out.push((a(i)?, offset + i)) end
-    // end
-    // out
-
     fun with_index(a: A, offset: USize = 0): Array[(B, USize)] =>
     """
     Returns the sequence with each element wrapped in a tuple alongside its
@@ -1299,25 +1261,6 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     end
     (a, acc)
 
-  // fun reduce(a: A, f: {(B, B): B}): B =>
-    // """
-    // Invokes fun for each element in the sequence with the accumulator.
-    // ````pony
-    // Seqs.reduce([1; 2; 3; 4], {(x: U32, acc: U32): U32 => x * acc})
-    // 24
-    // ````
-    // """
-    // var acc = B.min_value()
-    // try
-      // for i in Range[USize](0, a.size()) do
-        // let e = a(i)?
-        // let e_v = f(e, acc)
-        // // acc = (f_add as {(B, B): B})(acc, e_v)
-        // acc = f(acc, e_v)
-      // end
-    // end
-    // acc
-
   fun reduce(a: A, acc': B, f: {(B, B): B}): B =>
     """
     Invokes fun for each element in the sequence with the accumulator.
@@ -1367,26 +1310,33 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     [3; 2; 1]
     ````
     """
-    // char tmp;
-    // for (size_t i = 0; i < this->len / 2; i++) {
-    //     tmp                           = this->base[i];
-    //     this->base[i]                 = this->base[this->len - 1 - i];
-    //     this->base[this->len - 1 - i] = tmp;
-    // }
     for i in Range[USize](0, a.size()/2) do
-      try
-        let tmp = a(i)?
-        a(i)? =  a(a.size()-1 - i)?
-        a(a.size() - 1 - i)? = tmp
-      end
+      swap(a, i, a.size()-1-i)
     end
     a
 
-  // fun reverse(a: A, tail:(T|None) = None) =>
-  // """Reverses the elements in appends the tail, and returns it as a list."""
+  fun reverse_slice(a: A, start_index: USize, amount: USize) =>
+    """
+    Reverses the sequence in the range from initial start_index through count
+    elements.
 
-  // fun reverse_slice(a: A, start_index, count) =>
-  // """Reverses the sequence in the range from initial start_index through count elements."""
+    ````pony
+    let arr = Num[U32].range_i(1, 10)
+    Seqs.reverse_slice(arr, 5, 5)
+    [1; 2; 3; 4; 5; 10; 9; 8; 7; 6]
+    """
+    for i in Range[USize](0, amount/2) do
+      swap(a, start_index+i,  (start_index+amount) -1 -i)
+    end
+    a
+
+  fun swap(a: A, i: USize, j: USize): A^ =>
+    try
+      let tmp = a(i)?
+      a(i)? =  a(j)?
+      a(j)? = tmp
+    end
+    a
 
   fun scan(a: A, f: {(B, B): B}): A^ =>
     """
@@ -1466,12 +1416,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
     while i > 1 do
       let ceil = i = i - 1
-      try
-        // a.swap_elements(i, int[USize](ceil))?
-        let tmp = a(i)?
-        a(i)? = a(mt.int[USize](ceil))?
-        a(ceil)? = tmp
-      end
+        swap(a,i, mt.int[USize](ceil))
     end
     a
 
@@ -1490,11 +1435,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
     while i > 1 do
       let ceil = i = i - 1
-      try
-        let tmp = a(i)?
-        a(i)? = a(ceil)?
-        a(ceil)? = tmp
-      end
+      swap(a, i, ceil)
     end
     a
 
