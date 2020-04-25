@@ -5,7 +5,7 @@
 #+OPTIONS: toc:nil creator:nil author:nil email:nil timestamp:nil html-postamble:nil
 #+TODO: TODO DOING DONE
 
-[[file:logo.jpg][https://opencollective.com/ponyc]]
+[[https://opencollective.com/ponyc][file:logo.jpg]]
 # ** My little wish
 # #+BEGIN_SRC pony
 # let list = {1, 2, 5, 6, 7}            // List Literals
