@@ -3,7 +3,7 @@ seqs.pony --- I love pony 🐎.
 Date: 2020-04-24
 
 Copyright (C) 2016-2020, The Pony Developers
-Copyright (C) 2003-2020 Damon kwok <damon-kwok@outlook.com>
+Copyright (C) 2003-2020 Damon Kwok <damon-kwok@outlook.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,28 +28,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 use "collections"
+use "debug"
 
 primitive Num[A: (Real[A] val & Number) = ISize]
-  fun inc(a: A): A =>
+  fun inc(a: A, env: Env): A =>
+    env.out.print("inc: ==> a:"+ a.string())
     if a == A.max_value() then a else a+1 end
 
-  fun range(from: A, to: A): Array[A]^ =>
+  fun dec(a: A, env: Env): A =>
+    env.out.print("dec: ==> a:"+ a.string())
+    if a == A.min_value() then a else a-1 end
+
+  fun range(from: A, to: A, env: Env): Array[A]^ =>
+    env.out.print("range: ==> form:"+ from.string() +", to:"+to.string())
     let out = Array[A]
     // for i in Range[A](from, to) do
     //   out.push(i)
     // end
     var i = from
     while i != to do
-      out.push(i)
+      out.push(i.create(i))
       if from < to then i = i+1 else i = i-1 end
     end
     out
 
-  fun range_i(from: A, to: A): Array[A]^ =>
+  fun range_i(from: A, to: A, env: Env): Array[A]^ =>
+    env.out.print("range_i: ==> form:"+ from.string() +", to:"+to.string())
     if from <= to then
-      range(from, to + 1)
+      range(from, inc(to, env), env)
     else
-      range(from, to - 1)
+      range(from, dec(to, env), env)
     end
 
   fun range_n(from: A, n: A): Array[A]^ =>
