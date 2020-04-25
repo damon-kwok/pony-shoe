@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-primitive SortBy[A: Seq[B] ref, B: Any #read]
+primitive SortBy[A: Seq[B] ref = String, B: Any #read = U8]
   """
   Implementation of dual-pivot quicksort.  It operates in-place on the provided Seq, using
   a small amount of additional memory. The nature of the element-realation is expressed via
@@ -57,10 +57,10 @@ primitive SortBy[A: Seq[B] ref, B: Any #read]
 
   actor Main
     new create(env:Env) =>
-      let array = [ "third"; "second"; "first" ]
-      let sorted_array = Sort[Array[String], String](array)
-      for e in sorted_array.values() do
-        env.out.print(e) // prints "first \n second \n third"
+      let array = [ "aa"; "aaa"; "a" ]
+      SortBy[Array[String], String](array, {(x: String):USize => x.size()})
+      for e in array.values() do
+        env.out.print(e) // prints "a \n aa \n aaa"
       end
   ```
   """
