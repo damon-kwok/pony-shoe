@@ -3,7 +3,7 @@ seqs.pony ---  I love pony 🐎.
 Date: 2020-04-21
 
 Copyright (C) 2016-2020, The Pony Developers
-Copyright (C) 2003-2020 Damon kwok <damon-kwok@outlook.com>
+Copyright (C) 2003-2020 Damon Kwok <damon-kwok@outlook.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,68 @@ use "collections"
 use "random"
 use "debug"
 
-//B: (Comparable[B] & Hashable #read & Equatable[K] #read)
-primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
+primitive Seqs[A: Seq[B] ref = Array[USize],
+  B: Comparable[B] #read = USize] is Sequence[A, B]
+
+type Strings is Seqs[String ref, U8]
+
+primitive HashSeqs[A: Seq[B] ref = Array[USize],
+  B: (Comparable[B] #read & Hashable #read & Equatable[B] #read) = USize]
+  is Sequence[A, B]
+
+  fun frequencies(a: A): Map[B, USize] =>
+    """
+    Returns a map with keys as unique elements of sequence and values as the
+    count of every element.
+
+    ````pony
+    Seqs.frequencies("ant buffalo ant ant buffalo dingo")
+    // {1 => "dingo" , 2 => "buffalo", 3 => "ant"}
+    {"ant" => 3, "buffalo" => 2, "dingo" => 1}
+    """
+    var m = Map[B, USize]
+    for e in a.values() do
+      m(e) = m.get_or_else(e, 0) +1
+    end
+    m
+
+  fun frequencies_by(a: A, f_key: {(B): B} ): Map[B, USize] =>
+    """
+    Returns a map with keys as unique elements given by key_fun and values as the count of every element.
+
+    ````pony
+    Seqs.frequencies("ant buffalo ant ant buffalo dingo", {(i: USize): USize => i})
+    {3 => "ant", 2 => "buffalo", 1 => "dingo"}
+    ````
+    """
+    var m = Map[B, USize]
+    for e in a.values() do
+      let key = f_key(e)
+      m(key) = m.get_or_else(key, 0) +1
+    end
+    m
+
+  fun group_by(a: A, f_k: {(B): B}, f_v: {(B): B}): Map[B, A]^ =>
+    """
+    Splits the sequence into groups based on key_fun.
+    ````pony
+    let arr = "ant buffalo cat dingo".split(" ")
+    Enum.group_by(arr, {(B): B => })
+    %{3 => ["ant", "cat"], 5 => ["dingo"], 7 => ["buffalo"]}
+
+    Enum.group_by(~w{ant buffalo cat dingo}, &String.length/1, &String.first/1)
+    %{3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
+    ````
+    """
+    var m = Map[B, A]
+    for e in a.values() do
+      let k = f_k(e)
+      let v = f_v(e)
+      m(k) = m.get_or_else(k, a.create()).>push(v)
+    end
+    m
+
+trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
   """
   Provides a set of algorithms to work with `sequence`.
   In Pony, a `sequence` is any data type that implements the `interface seq[A]`.
@@ -62,11 +122,14 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     [1; 2; 4; 5]
     ````
     """
-    let t = typeof(a)
-    match t
-      | ListType => try (a as List[B]).remove(i)? end
-      | ArrayType => try (a as Array[B]).remove(i, 1) end
-      | StringType => try (a as StringDelete).delete(i.isize_unsafe(), 1) end
+    iftype A <: List[B] then
+      try a.remove(i)? end
+    end
+    iftype A <: Array[B] then
+      a.remove(i, 1)
+    end
+    iftype A <: String then
+      a.delete(i.isize_unsafe(), 1)
     end
 
   // Imitation functions
@@ -405,26 +468,6 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     end
     out
 
-  // fun min_max_by1(a: A, compare: {(B, B): Bool}): (B, B)? =>
-  //   """
-  //   Returns a tuple with the minimal and the maximal elements in the sequence
-  //   as calculated by the given function.
-  //
-  //   ````pony
-  //
-  //   ````
-  //   """
-  //   var out = (a(0)?, a(0)?)
-  //   for i in Range[USize](0, a.size()) do
-  //     let v = a(i)?
-  //     if compare(v, out._1)==false then
-  //       out = (v, out._2)
-  //       elseif compare(v, out._2) then
-  //         out = (out._1, v)
-  //     end
-  //   end
-  //   out
-
   fun min_max_by(a: A, f_eval: {(B): USize}): (B, B)? =>
     """
     Returns a tuple with the minimal and the maximal elements in the sequence
@@ -759,7 +802,22 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     var out = a(0)?
     for i in Range[USize](1, a.size()) do
-      // out = (out as Sumable[B]).add(a(i)?)
+      out = f_add(out, a(i)?)
+    end
+    out
+
+  fun sum_by(a: A, f_add: {(B, B): B}): B? =>
+    """
+    Returns the sum of all elements.
+
+    ````pony
+    Seqs[Array[I32], I32].sum([1; 2; 3])
+    6
+    ````
+    """
+    var out = a(0)?
+    for i in Range[USize](1, a.size()) do
+      // out = (out as Addable[B]) + a(i)?
       out = f_add(out, a(i)?)
     end
     out
@@ -790,7 +848,7 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     end
     a
 
-  fun dedup_by(a: A, f: ({(B): B} | None) = None): A^ =>
+  fun dedup_by(a: A, f: {(B): B}): A^ =>
     """
     Traverse the sequence, returning a list where all consecutive duplicated
     elements are collapsed to a single element.
@@ -805,12 +863,14 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     if a.size() < 2 then a end
     try
-      var v = if f is None then a(0)? else (f as {(B): B})(a(0)?) end
+      // var v = if f is None then a(0)? else (f as {(B): B})(a(0)?) end
+      var v = f(a(0)?)
       var i: USize = 1
       for e in a.values() do
         if i == 0 then continue end
-        var cur  = if f is None then e else (f as {(B): B})(e) end
-        if v == cur then remove(a, i) else v = cur end
+          // var cur  = if f is None then e else (f as {(B): B})(e) end
+          var cur  = f(e)
+          if v == cur then remove(a, i) else v = cur end
       end
     end
     a
@@ -1018,36 +1078,6 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     // """
     // Maps and reduces a sequence, flattening the given results (only one level deep).
     // """
-
-  // fun frequencies(a: A, f_hash: ({(B): USize} | None) = None): Map[B, USize] =>
-    // """
-    // Returns a map with keys as unique elements of sequence and values as the
-    // count of every element.
-    // """
-    // var m = Map[B, USize]
-    // for e in a.values() do
-      // try
-        // if f_hash is None then
-        // let hash = (f_hash as Hashable).hash(e)
-        // if m.contains((f_hash as Hashable)) then
-          // m((f_hash as Hashable))=m
-          // ((f_hash as Hashable))+1
-          // else
-            // m(hash)=1 end
-      // else
-        // let hash = (f_hash as {(B): USize})(e)
-        // if m.contains(hash) then m(hash)=m(hash)+1 else m(hash)=1 end
-      // end
-    // end
-      //
-    // end
-    // m
-
-  // fun frequencies_by(a: A, key_fn) =>
-  // """Returns a map with keys as unique elements given by key_fun and values as the count of every element."""
-
-  // fun group_by(a: A, k_f, v_f): Map[USize, A] =>
-    // """Splits the sequence into groups based on key_fun."""
 
   fun intersperse(a: A, x: B): A^ =>
     """
@@ -1573,22 +1603,32 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
     """
     Return `sequence` type enum value.
     """
-    try
-      (a as List[B])
+    // try
+      // (a as List[B])
+      // return ListType
+    // else
+      // try
+        // (a as Array[B])
+        // return ArrayType
+      // else
+        // try
+          // (a as StringDelete)
+          // return StringType
+        // else
+          // return UnknowType
+        // end
+      // end
+    // end
+    iftype A <: List[B] then
       return ListType
-    else
-      try
-        (a as Array[B])
-        return ArrayType
-      else
-        try
-          (a as StringDelete)
-          return StringType
-        else
-          return UnknowType
-        end
-      end
     end
+    iftype A <: Array[B] then
+      return ArrayType
+    end
+    iftype A <: String then
+      return StringType
+    end
+    UnknowType
 
   fun trace(a: A, f: ({(B): String val} | None) = None) =>
     """
@@ -1620,30 +1660,8 @@ primitive Seqs[A: Seq[B] ref = Array[USize], B: Comparable[B] #read = USize]
 interface Cloneable[A: Seq[B] ref, B: Comparable[B] #read]
   fun clone(): A^
 
-// interface Sumable[A: Any]
-  // fun add(a: A, b: A): A
-
-interface ListRemove[A] is Seq[A]
-  fun ref remove(i: USize): ListNode[A] ?
-
-interface ArrayRemove[A] is Seq[A]
-  fun ref remove(i: USize, n: USize)
-
-interface StringDelete is (Seq[U8] & Comparable[String box] & Stringable)
-  fun ref delete(offset: ISize, len: USize = 1)
-  fun size(): USize
-
-// Enum SeqType
 primitive ArrayType
 primitive ListType
 primitive StringType
 primitive UnknowType
 type SeqType is (ArrayType | ListType | StringType | UnknowType)
-
-type ArrayStrSeqs is Seqs[Array[String], String]
-type ListStrSeqs is Seqs[Array[String], String]
-type StrSeqs is Seqs[String ref, U8]
-
-// primitive Seqs[A: Seq[B] ref, B: (Comparable[B] #read & Stringable #read)]
-//
-//sequence.pony ends here
