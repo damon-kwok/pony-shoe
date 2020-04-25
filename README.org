@@ -27,6 +27,7 @@ Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2})
 #+END_SRC
 
 *** Find
+#+BEGIN_SRC pony
 Seqs.min([5; 6; 7; 3; 1; 2])
 1
 
@@ -53,7 +54,7 @@ Seqs.head([1; 2; 3; 4; 5; 6])
 
 Seqs.tail([1; 2; 3; 4; 5; 6])
 [2; 3; 4; 5; 6]
-
+#+END_SRC
 *** Sort
 #+BEGIN_SRC pony
 
