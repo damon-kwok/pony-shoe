@@ -14,6 +14,21 @@
 # let map  = <"a":1, "b":2, "c":3>      // Map Literals
 # #+END_SRC
 
+*!This is just my scratch paper!*
+Note, Generic parameters are omitted from the example
+
+Prefab type alias:
+#+BEGIN_SRC pony
+type StrSeq is Seqs[String ref, U8]
+#+END_SRC
+
+// For example:
+#+BEGIN_SRC pony
+let str = "hello,world".string()
+StrSeq.is_member(str, 'w')
+true
+#+END_SRC
+
 *** Basic
 #+BEGIN_SRC pony
 Seqs.is_all([2; 4; 6], {(x: U32): Bool => x %% 2 == 0})
@@ -40,14 +55,16 @@ true
 Seqs.is_empty([1; 2; 3])
 false
 
-Seqs[Array[I32], I32].is_member?(1; 2; 3; 4; 5; 6; 7; 8; 9; 10, 5)
+Seqs.is_member([1; 2; 3; 4; 5; 6], 5)
 true
 
-Seqs[Array[I32], I32].is_member?(1; 2; 3; 4; 5; 6; 7; 8; 9; 10, 5.0)
+Seqs.is_member([1; 2; 3; 4; 5; 6], 7)
 false
 
-count
+Seqs.count([1; 2; 3; 4; 5; 6])
+6
 #+END_SRC
+
 *** Traverse
 #+BEGIN_SRC pony
 Seqs.each(["some"; "example"], {(x: String) => print(x)})
@@ -70,10 +87,10 @@ Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2})
 Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2}, 2)
 [4; 16; 36]
 
-Seqs.map([1; 2; 3, 4, 5], {(x: U32): U32 => x * x})
+Seqs.map([1; 2; 3; 4; 5], {(x: U32): U32 => x * x})
 [1; 4; 9, 16, 25]
 
-Seqs.map([1; 2; 3, 4, 5], {(i: USize, x: U32): U32 => x * x})
+Seqs.map([1; 2; 3; 4; 5], {(i: USize, x: U32): U32 => x * x})
 [1; 4; 9, 16, 25]
 
 Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
@@ -151,6 +168,7 @@ Seqs.head([1; 2; 3; 4; 5; 6])
 Seqs.tail([1; 2; 3; 4; 5; 6])
 [2; 3; 4; 5; 6]
 #+END_SRC
+
 *** Sort
 #+BEGIN_SRC pony
 
