@@ -99,7 +99,7 @@ Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
 
 Seqs.table(["name"], ["lucy", "lily"], {(col: String, row: String) => print(col+":"+row) })
 "name:lucy"
-"name:lily
+"name:lily"
 
 let f = {(col: U32, row: U32) => print(col*row) }
 Seqs.table(Num.range_i(1,3), Num.range_i(1,3), f)
@@ -243,6 +243,9 @@ Seqs.map_join([1; 2; 3], " = ", {(x: U32): U32 => x * 2})
 #+BEGIN_SRC pony
 Seqs.sum([1; 2; 3])
 6
+
+Seqs.sum_by(["1"; "2"; "3"], {(a: String, b: String): String => a+":"+b})
+"1:2:3"
 
 Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
 [1; 3; 6; 10; 15]
