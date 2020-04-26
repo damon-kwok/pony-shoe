@@ -34,7 +34,7 @@ use "debug"
 primitive Seqs[A: Seq[B] ref = Array[USize],
   B: Comparable[B] #read = USize] is Sequence[A, B]
 
-type Strings is Seqs[String ref, U8]
+type StrSeq is Seqs[String ref, U8]
 
 primitive HashSeqs[A: Seq[B] ref = Array[USize],
   B: (Comparable[B] #read & Hashable #read & Equatable[B] #read) = USize]
@@ -111,11 +111,31 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     [1; 2; 3; 4; 5]
     ````
     """
-    try
-      (a as Cloneable[A, B]).clone()
+    // iftype A <: String then
+      // return a.clone()
+    // end
+
+    // iftype A <: List[B] then
+      // return a.clone()
+    // end
+
+    // iftype A <: Array[B] then
+      // return a.clone()
+    // end
+    // a.create()
+
+    // try
+      // (a as Cloneable[A]).clone()
+    // else
+      // a.create()
+    // end
+
+    match a
+      | let a': Cloneable[A] => a'.clone()
     else
       a.create()
     end
+
 
   fun remove(a: A, i: USize) =>
     """
@@ -126,6 +146,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     [1; 2; 4; 5]
     ````
     """
+    /*
     iftype A <: List[B] then
       try a.remove(i)? end
     end
@@ -135,22 +156,39 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     iftype A <: String then
       a.delete(i.isize_unsafe(), 1)
     end
+    */
 
-  // Imitation functions
+    // try (a as List[B]).remove(i)? end
+    // try (a as Array[B]).remove(i, 1) end
+    // try (a as StringDelete).delete(i.isize_unsafe(), 1) end
+    // let typ = typeof(a)
+    // match typ
+      // | ListType  => try (a as List[B]).remove(i)? end
+      // | ArrayType => try (a as Array[B]).remove(i, 1) end
+      // | StringType => try (a as StringDelete).delete(i.isize_unsafe(), 1) end
+    // end
+
+    // let a': String => env.out.print(a)
+    match a
+      | let a': List[B]  => try a'.remove(i)? end
+      | let a': Array[B] => a'.remove(i, 1)
+      | let a': StringDelete => a'.delete(i.isize_unsafe(), 1)
+    end
+
+  // Basic
 
   fun is_all(a: A, f: {(B): Bool}): Bool =>
-
     """
     Returns true if fun.(element) is truthy for all elements in sequence.
 
     ````pony
-    Seqs.is_all?([2; 4; 6], {(x: U32): Bool => x %% 2 == 0})
+    Seqs.is_all([2; 4; 6], {(x: U32): Bool => x %% 2 == 0})
     true
 
-    Seqs.is_all?([2; 3; 4], {(x: U32): Bool => x %% 2 == 0})
+    Seqs.is_all([2; 3; 4], {(x: U32): Bool => x %% 2 == 0})
     false
 
-    Seqs.is_all?([], {(x: U32): Bool => x > 0})
+    Seqs.is_all([], {(x: U32): Bool => x > 0})
     true
     ````
     """
@@ -164,13 +202,13 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     Returns true if fun.(element) is truthy for at least one element in sequence.
 
     ````pony
-    Seqs.is_all?([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
+    Seqs.is_any([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
     false
 
-    Seqs.is_all?([2; 3; 4], {(x: U32): Bool => x %% 2 == 1})
+    Seqs.is_any([2; 3; 4], {(x: U32): Bool => x %% 2 == 1})
     true
 
-    Seqs.is_all?([], {(x: U32): Bool => x > 0})
+    Seqs.is_any([], {(x: U32): Bool => x > 0})
     false
     ````
     """
@@ -184,10 +222,10 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     Determines if the sequence is empty.
 
     ````pony
-    Seqs.is_empty?([])
+    Seqs.is_empty([])
     true
 
-    Seqs.is_empty?([1; 2; 3])
+    Seqs.is_empty([1; 2; 3])
     false
     ````
     """
@@ -198,19 +236,19 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     Checks if element exists within the `sequence`.
 
     ````pony
-    Seqs[Array[I32], I32].is_member?(1; 2; 3; 4; 5; 6; 7; 8; 9; 10, 5)
+    Seqs.is_member([1; 2; 3; 4; 5; 6; 7; 8; 9; 10], 5)
     true
 
-    Seqs[Array[I32], I32].is_member?(1; 2; 3; 4; 5; 6; 7; 8; 9; 10, 5.0)
+    Seqs.is_member([1; 2; 3; 4; 5; 6; 7; 8; 9; 10], 5.0)
     false
 
-    Seqs[Array[F32], F32].is_member?([1.0; 2.0; 3.0], 2)
+    Seqs[Array[F32], F32].is_member([1.0; 2.0; 3.0], 2)
     false
 
-    Seqs[Array[F32], F32].is_member?([1.0; 2.0; 3.0], 2.000)
+    Seqs[Array[F32], F32].is_member([1.0; 2.0; 3.0], 2.000)
     true
 
-    Seqs[Array[U8], U8].is_member?(['a'; 'b'; 'c'], 'd')
+    Seqs[Array[U8], U8].is_member(['a'; 'b'; 'c'], 'd')
     false
     ````
     """
@@ -232,16 +270,27 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     2
     ````
     """
-    try
-      let fn = (f as {(B): Bool})
+    match a
+      | let f': {(B): Bool} =>
       var n: USize = 0
       for e in a.values() do
-        if fn(e) then n = n + 1 end
+        if f'(e) then n = n + 1 end
       end
       n
     else
       a.size()
     end
+
+    // try
+      // let fn = (f as {(B): Bool})
+      // var n: USize = 0
+      // for e in a.values() do
+        // if fn(e) then n = n + 1 end
+      // end
+      // n
+    // else
+      // a.size()
+    // end
 
   fun first(a: A): B? =>
     """
@@ -312,7 +361,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun tail(a: A): A^ =>
     """
-    Extract the elements after the head of a list (zero-based).
+    Extract the elements after the head of a sequence (zero-based).
 
     ````pony
     Seqs.tail([1; 2; 3; 4; 5])
@@ -538,7 +587,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   // fun chunk_every(count, step, leftover \\ []) =>
     // """
-    // Returns list of lists containing count elements each, where each new chunk
+    // Returns sequence of lists containing count elements each, where each new chunk
     // starts step elements into the sequence.
     // """
 
@@ -676,7 +725,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun take_every(a: A, nth': USize): A^ =>
     """
-    Returns a list of every nth element in the sequence, starting with the
+    Returns a sequence of every nth element in the sequence, starting with the
     first element.
 
     ````pony
@@ -742,8 +791,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun concat(arr: Array[A]): A^? =>
     """
-    Given a sequence of sequences, concatenates the sequences into a single
-    list.
+    Given a sequence array, concatenates the sequences into a single sequence.
 
     ````pony
     Seqs.concat([[1; 2; 3]; [4; 5; 6]; [7; 8; 9])
@@ -812,7 +860,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun dedup(a: A): A^ =>
     """
-    Traverse the sequence, returning a list where all consecutive
+    Traverse the sequence, returning a sequence where all consecutive
     duplicated elements are collapsed to a single element.
 
     ````pony
@@ -838,7 +886,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun dedup_by(a: A, f: {(B): B}): A^ =>
     """
-    Traverse the sequence, returning a list where all consecutive duplicated
+    Traverse the sequence, returning a sequence where all consecutive duplicated
     elements are collapsed to a single element.
 
     ````pony
@@ -909,7 +957,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
  fun drop_every(a: A, nth': USize): A^ =>
     """
-    Returns a list of every nth element in the sequence dropped,
+    Returns a sequence of every nth element in the sequence dropped,
     starting with the first element.
 
     ````pony
@@ -947,20 +995,6 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
       end
     end
     a
-
-  fun each(a: A, f: {(B)}) =>
-    """
-    Invokes the given fun for each element in the sequence.
-
-    ````pony
-    Seqs.each(["some"; "example"], {(x: String) => env.out.print(x)})
-    "some"
-    "example"
-    ````
-    """
-    for e in a.values() do
-      f(e)
-    end
 
   fun filter(a: A, f: {(B): Bool}): A^ =>
     """
@@ -1172,19 +1206,19 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     var s: String = ""
     var i: USize = 0
     for e in a.values() do
-      if f_str is None then
-        s = s + try (e as Stringable).string() else "*" end
+      match f_str
+        | let f_str': {(B): String} => s = s + f_str'(e)
       else
-        s = s + try (f_str as {(B): String val})(e) else "*" end
+        s = s + try (e as Stringable).string() else "*" end
       end
       if i < (a.size() - 1) then s = s.add(joiner) end
       i = i + 1
     end
     s
 
-  fun map(a: A, f: {(B): B}): A^ =>
+  fun map(a: A, f: ({(B): B} | {(USize, B): B})): A^ =>
     """
-    Returns a list where each element is the result of invoking fun on each
+    Returns a sequence where each element is the result of invoking fun on each
     corresponding element of sequence.
 
     ````pony
@@ -1196,15 +1230,19 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     ````
     """
     var i: USize = 0
+
     for e in a.values() do
-      try a(i)? = f(e) end
+      match f
+        | let f': {(B): B} => f'(e)
+        | let f': {(USize, B): B} => f'(i, e)
+      end
       i = i + 1
     end
     a
 
   fun map_every(a: A, nth': USize, f: {(B): B}): A^ =>
     """
-    Returns a list of results of invoking fun on every nth' element of
+    Returns a sequence of results of invoking fun on every nth' element of
     sequence, starting with the first element.
 
     ````pony
@@ -1265,17 +1303,16 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     var i: USize = 0
     for e in a.values() do
       let e' = f_mapper(e)
-      if f_str is None then
-        s = s + try (e' as Stringable).string() else "*" end
+      match f_str
+        | let f_str': {(B): String} => s = s + f_str'(e')
       else
-        s = s + try (f_str as {(B): String val})(e') else "*" end
+        s = s + try (e' as Stringable).string() else "*" end
       end
       if i < (a.size() - 1) then s = s.add(joiner) end
       i = i + 1
     end
     s
 
-  // ({(B, B): B} | None) = None
   fun map_reduce(a: A, acc': B, f_mapper:{(B, B): (B, B)}, f_add: {(B, B): B}): (A, B) =>
     """
     Invokes the given function to each element in the sequence to reduce
@@ -1312,7 +1349,6 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
       for i in Range[USize](0, a.size()) do
         let e = a(i)?
         let e_v = f(e, acc)
-        // acc = (f_add as {(B, B): B})(acc, e_v)
         acc = f(acc, e_v)
       end
     end
@@ -1333,7 +1369,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun reject(a: A, f: {(B): Bool}) =>
     """
-    Returns a list of elements in sequence excluding those for which the
+    Returns a sequence of elements in sequence excluding those for which the
     function fun returns a truthy value.
 
     ````pony
@@ -1344,7 +1380,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun reverse(a: A): A^ =>
     """
-    Returns a list of elements in sequence in reverse order.
+    Returns a sequence of elements in sequence in reverse order.
 
     ````pony
     Seqs.reverse([1; 2; 3])
@@ -1372,6 +1408,8 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     a
 
   fun swap(a: A, i: USize, j: USize): A^ =>
+    """
+    """
     try
       let tmp = a(i)?
       a(i)? =  a(j)?
@@ -1379,33 +1417,128 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     end
     a
 
-  fun scan(a: A, f: {(B, B): B}): A^ =>
+  fun each(a: A, f: ({(B)} | {(USize, B)})) =>
+    """
+    Invokes the given fun for each element in the sequence.
+
+    ````pony
+    Seqs.each(["some"; "example"], {(x: String) => env.out.print(x)})
+    "some"
+    "example"
+    ````
+    """
+    var i: USize = 0
+    for e in a.values() do
+      match f
+        | let f': {(B)} => f'(e)
+        | let f': {(USize, B)} => i=i+1; f'(i, e)
+      end
+      // try (f as {(B)})(e) end
+      // try (f as {(USize, B)})(i ,e) end
+      // i = i+1
+    end
+
+  fun scan(a: A, f: ({(B, B): B} | {(B, B, B): B})): A^ =>
     """
     Applies the given function to each element in the sequence, storing the
-    result in a list and passing it as the accumulator for the next computation.
+    result in a sequence and passing it as the accumulator for the next computation.
     Uses the first element in the sequence as the starting value.
 
     ````pony
-    Seqs.scan([1; 2; 3; 4; 5], {(x: U32, y: U32): U32 => x+y })
+    Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
+    [1; 3; 6; 10; 15]
+
+    let fiber = Array[USize]
+    Seqs.scan([1; 2; 3; 4; 5], {(prev2: U32, prev1: U32, curr: U32): U32 => fiber.push(prev2+prev1); curr })
     [1; 3; 6; 10; 15]
     ````
     """
-    for i in Range[USize](1, a.size()) do
-      try a(i)? = f(a(i-1)?, a(i)?) end
+    var start: USize = 1
+    match f
+        | let f': {(B, B, B): B} => start=2
+    end
+    // try (f as {(B, B, B): B }); start = 2 end
+
+    for i in Range[USize](start, a.size()) do
+        // try a(i)? = (f as {(B, B): B})(a(i-1)?, a(i)?) end
+        // try a(i)? = (f as {(B, B, B): B})(a(i-2)?, a(i-1)?, a(i)?) end
+        match f
+          | let f': {(B, B): B} => try f'(a(i-1)?, a(i)?) end
+          | let f': {(B, B, B): B} => try f'(a(i-2)?, a(i-1)?, a(i)?) end
+        end
     end
     a
 
-  // fun scan(a: A, acc, fn) =>
-  // """Applies the given function to each element in the sequence, storing the result in a list and passing it as the accumulator for the next computation. Uses the given acc as the starting value."""
+  fun skip(a: A, interval: USize, f: ({(B)} | {(USize, B)}) ) =>
+    """
+    """
+    for i in Range[USize](0, a.size()) do
+      if (i %% interval) == 0 then
+        // try (f as {(B)})(a(i)?) end
+        // try (f as {(USize, B)})(i, a(i)?) end
+        match f
+          | let f': {(B)} => try f'(a(i)?) end
+          | let f': {(USize, B)} => try f'(i, a(i)?) end
+        end
+      end
+    end
 
-  fun slice_range(a: A, index_range) =>
+  fun stair(a: A, f: ({(B)} | {(USize, B)} | {(USize, USize, B)}) ) =>
     """
-    Returns a subset list of the given sequence by index_range.
     """
+    for i in Range[USize](0, a.size()) do
+      for j in Range[USize](0, i+1) do
+        // try (f as {(B)})(a(i)?) end
+        // try (f as {(USize, B)})(i, a(i)?) end
+        // try (f as {(USize, USize, B)})(i, j, a(i)?) end
+        match f
+          | let f': {(B)} => try f'(a(i)?) end
+          | let f': {(USize, B)} => try f'(i, a(i)?) end
+          | let f': {(USize, USize, B)} => try f'(i, j, a(i)?) end
+        end
+      end
+    end
+
+  fun table(cols: A, rows: A, f: ({(B, B)} |{(USize, B, USize, B) }) ) =>
+    """
+    """
+    for col in Range[USize](0, cols.size()) do
+      for row in Range[USize](0, rows.size()) do
+        // try (f as {(B, B)})(cols(col)?, rows(row)?) end
+        // try (f as {(USize, B, USize, B)})(col, cols(col)?, row, rows(row)?) end
+        match f
+         | let f': {(B, B)} => try f'(cols(col)?, rows(row)?) end
+         | let f': {(USize, B, USize, B)} =>try f'(col, cols(col)?, row, rows(row)?) end
+       end
+    end
+    end
+
+  fun matix(arr: Array[A]): Array[A]^ =>
+    """
+    """
+    arr
+
+  // fun scan(a: A, acc, fn) =>
+  // """Applies the given function to each element in the sequence, storing the result in a sequence and passing it as the accumulator for the next computation. Uses the given acc as the starting value."""
+
+  fun slice_range(a: A, from: USize, to: USize): A^ =>
+    """
+    Returns a subset sequence of the given sequence by index_range.
+
+    ````pony
+    Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 7)
+    [5; 6]
+
+    Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], -3, 2)
+    [7; 6; 5; 4; 3]
+    ````
+    """
+    let out = a.create()
+    out
 
   fun slice(a: A, index: ISize, n: USize): A^ =>
     """
-    Returns a subset list of the given sequence, from index (zero-based)
+    Returns a subset sequence of the given sequence, from index (zero-based)
     with amount number of elements if available.
 
     ````pony
@@ -1452,7 +1585,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun shuffle(a: A): A^ =>
     """
-    Returns a list with the elements of sequence shuffled.
+    Returns a sequence with the elements of sequence shuffled.
 
     ````pony
     Seqs.shuffle([1; 2; 3; 4; 5])
@@ -1470,7 +1603,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun rotation(a: A, n: USize): A^ =>
     """
-    Returns a list with the elements of sequence shuffled.
+    Returns a sequence with the elements of sequence shuffled.
 
     ````pony
     Seqs.rotation([1; 2; 3; 4; 5; 6; 7], 1)
@@ -1507,7 +1640,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun to_array(a: A): Array[B]^ =>
     """
-    Converts sequence to a list.
+    Converts sequence to a array.
 
     ````pony
     Seqs.to_array({1, 2, 3})
@@ -1567,7 +1700,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
   fun zip(sequences: Seq[A]) =>
     """
     Zips corresponding elements from a finite collection of sequences into one
-    list of tuples.
+    sequence of tuples.
 
     ````pony
     Seqs.zip([[1, 2, 3], ['a', 'b', 'c'], ["foo", "bar", "baz"]])
@@ -1580,7 +1713,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun zip2(a: A, b: A) =>
     """
-    Zips corresponding elements from two sequences into one list of tuples.
+    Zips corresponding elements from two sequences into one sequence of tuples.
 
     ````pony
     Seqs.zip([1, 2, 3], ['a', 'b', 'c'])
@@ -1604,11 +1737,13 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     end
     UnknowType
 
-  fun trace(a: A, f: ({(B): String val} | None) = None) =>
+  fun trace(a: A, env: Env, f: ({(B): String} | None) = None) =>
     """
     Print `sequence` debug info.
     """
+    // env.out.print("11111")
     let t = typeof(a)
+    // env.out.print("22222")
     var out = "[Trace] "
     var joiner = ","
     match t
@@ -1624,15 +1759,27 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
       | UnknowType => out = out + "<Unknow type!> $ size:"+a.size().string()
     end
     out = out + join(a, joiner, f)
+    // env.out.print("22222")
     match t
       | ListType => out = out + "}"
       | ArrayType => out = out + "]"
       | StringType => out = out +"\""
     end
-    Debug.out(out)
+    // env.out.print("3333")
+    //Debug.out(out)
+    // env.out.print(out)
 
-interface Cloneable[A: Seq[B] ref, B: Comparable[B] #read]
+// interface Cloneable[A: Seq[B] ref, B: Comparable[B] #read]
+interface Cloneable[A]
   fun clone(): A^
+interface StringDelete// is (Seq[U8] & Comparable[String box] & Stringable)
+  fun ref delete(offset: ISize, len: USize = 1)
+
+// interface ListRemove[A] is Seq[A]
+  // fun ref remove(i: USize): ListNode[A] ?
+
+// interface ArrayRemove
+  // fun ref remove(i: USize, n: USize)
 
 primitive ArrayType
 primitive ListType
