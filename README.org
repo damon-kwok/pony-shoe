@@ -40,13 +40,13 @@ false
 Seqs.is_all([], {(x: U32): Bool => x > 0})
 true
 
-Seqs.is_all([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
+Seqs.is_any([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
 false
 
-Seqs.is_all([2; 3; 4], {(x: U32): Bool => x %% 2 == 1})
+Seqs.is_any([2; 3; 4], {(x: U32): Bool => x %% 2 == 1})
 true
 
-Seqs.is_all([], {(x: U32): Bool => x > 0})
+Seqs.is_any([], {(x: U32): Bool => x > 0})
 false
 
 Seqs.is_empty([])
@@ -124,19 +124,19 @@ Seqs.table(Num.range_i(1,3), Num.range_i(1,3), f)
 2 4 6
 3 6 9
 
-Seqs.matix([Num.range_i(1,3), Num.range_i(1,3)], f)
-1 2 3
-2 4 6
-3 6 9
-
 Seqs.matix([Num.range_i(1,9), Num.range_i(1,9)], Num.range_i(1,9)], f)
 ...
 
-Seqs.skip([1; 2; 3; 4; 5; 6; 7], 1, {(i: USize, x: U32) => print(x.string())})
-1
-3
-5
-7
+Seqs.skip([1; 2; 3; 4; 5; 6; 7], 1, {(x: U32) => print(x.string())})
+"1"
+"3"
+"5"
+"7"
+
+Seqs.skip([1; 2; 3; 4; 5; 6; 7], 2, {(i: USize, x: U32) => print(i.string()+":"+x.string())})
+"0:1"
+"3:4"
+"6:7"
 #+END_SRC
 
 *** Find
