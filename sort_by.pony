@@ -1,5 +1,5 @@
 /*
-seqs.pony ---  I love pony 🐎.
+sort_by.pony ---  I love pony 🐎.
 Date: 2020-04-22
 
 Copyright (C) 2016-2020, The Pony Developers
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-primitive SortBy[A: Seq[B] ref = String, B: Any #read = U8]
+primitive SortBy[A: Seq[B] ref = Array[String], B: Any #read = String]
   """
   Implementation of dual-pivot quicksort.  It operates in-place on the provided Seq, using
   a small amount of additional memory. The nature of the element-realation is expressed via
@@ -58,7 +58,7 @@ primitive SortBy[A: Seq[B] ref = String, B: Any #read = U8]
   actor Main
     new create(env:Env) =>
       let array = [ "aa"; "aaa"; "a" ]
-      SortBy[Array[String], String](array, {(x: String):USize => x.size()})
+      SortBy(array, {(x: String):USize => x.size()})
       for e in array.values() do
         env.out.print(e) // prints "a \n aa \n aaa"
       end
