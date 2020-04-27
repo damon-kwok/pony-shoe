@@ -5,11 +5,11 @@
 
 # Summary
 
-Add a `SortBy` primitive to `collections` package. `SortBy` primitive like `Sort`, but it use a `lambda` replaced `interface Comparable`.
+Add a `SortBy` primitive to `collections` package.
 
 # Motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
+`SortBy` primitive like `Sort`, but it use a `lambda` replaced `interface Comparable`. it can use the any type for Key.
 
 # Detailed design
 

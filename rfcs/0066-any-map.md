@@ -5,11 +5,11 @@
 
 # Summary
 
-Add a `AnyMap` primitive to `collections` package. `AnyMap` primitive like `Map`, but it use a `lambda` for hash calculation.
+Add a `AnyMap` primitive to `collections` package.
 
 # Motivation
 
-AnyMap[K,V] can use the any type for Key.
+`AnyMap` primitive like `Map`, but it use a `lambda` for hash calculation. it can use the any type for Key.
 
 # Detailed design
 
