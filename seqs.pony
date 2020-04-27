@@ -31,8 +31,14 @@ use "collections"
 use "random"
 use "debug"
 
+// type Seqs is Seqx[String ref, U8]
+primitive Seqs[A: Seq[B] ref = String ref,
+  B: Comparable[B] #read = U8] is _Sequence[A, B]
 
-primitive Seqs[A: Seq[B] ref = Array[U8], B: Comparable[B] #read = U8]
+primitive Seqx[A: Seq[B] ref = Array[ISize],
+  B: Comparable[B] #read = ISize] is _Sequence[A, B]
+
+interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   """
   Provides a set of algorithms to work with `sequence`.
   In Pony, a `sequence` is any data type that implements the `interface seq[A]`.
@@ -703,7 +709,7 @@ primitive Seqs[A: Seq[B] ref = Array[U8], B: Comparable[B] #read = U8]
     arr.clear()
     out
 
-  fun merge(left: A, right: A) =>
+  fun merge(left: A, right: A): A^ =>
     """
     Concatenates the sequence on the right with the sequence on the left.
 
@@ -718,6 +724,7 @@ primitive Seqs[A: Seq[B] ref = Array[U8], B: Comparable[B] #read = U8]
     while right.size() > 0 do
       try left.push(right.shift()?) end
     end
+    left
 
   fun sum(a: A, f_add: {(B, B): B}): B? =>
     """

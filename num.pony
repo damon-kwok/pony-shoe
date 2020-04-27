@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 use "collections"
 use "debug"
 
-primitive Num[A: (Real[A] val & Number) = U8]
+primitive Num[A: (Real[A] val & Number) = ISize]
   fun inc(a: A): A =>
     if a == A.max_value() then a else a+1 end
 
