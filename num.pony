@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 use "collections"
 use "debug"
 
-primitive Num[A: (Real[A] val & Number) = ISize]
+primitive Num[A: (Real[A] val & Number) = U8]
   fun inc(a: A): A =>
     if a == A.max_value() then a else a+1 end
 
@@ -43,9 +43,6 @@ primitive Num[A: (Real[A] val & Number) = ISize]
     """
     """
     let out = Array[A]
-    // for i in Range[A](from, to) do
-    //   out.push(i)
-    // end
     var i = from
     while i != to do
       out.push(i.create(i))
@@ -66,9 +63,6 @@ primitive Num[A: (Real[A] val & Number) = ISize]
     """
     """
     let out = Array[A]
-    // for i in Range[A](from, from + n) do
-    //   out.push(i)
-    // end
     var i = from
     while i != (from+n) do
       if n > 0 then i = i+1 else i = i-1 end
