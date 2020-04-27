@@ -3,7 +3,7 @@ sort_by.pony ---  I love pony 🐎.
 Date: 2020-04-22
 
 Copyright (C) 2016-2020, The Pony Developers
-Copyright (C) 2003-2020 Damon kwok <damon-kwok@outlook.com>
+Copyright (C) 2003-2020 Damon Kwok <damon-kwok@outlook.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
