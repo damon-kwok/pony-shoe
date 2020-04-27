@@ -104,16 +104,6 @@ Seqs.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
 'a' 'a'
 'c' 'c' 'c'
 
-fun output (i: USize, x: U32) {
-  let str = (i+1).string() + "x" + (i+1).string() + "="
-  let v= (i+1) * x
-  Debug.out(str+v.string())
-}
-Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
-1x1=1
-1x2=2 2x2=4
-1x3=3 2x3=6 3x3=9
-
 Seqs.table(["name"], ["lucy", "lily"], {(col: String, row: String) => print(col+":"+row) })
 "name:lucy"
 "name:lily"
