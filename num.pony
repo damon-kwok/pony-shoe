@@ -31,16 +31,17 @@ use "collections"
 use "debug"
 
 primitive Num[A: (Real[A] val & Number) = ISize]
-  fun inc(a: A, env: Env): A =>
-    env.out.print("inc: ==> a:"+ a.string())
+  fun inc(a: A): A =>
     if a == A.max_value() then a else a+1 end
 
-  fun dec(a: A, env: Env): A =>
-    env.out.print("dec: ==> a:"+ a.string())
+  fun dec(a: A): A =>
+    """
+    """
     if a == A.min_value() then a else a-1 end
 
-  fun range(from: A, to: A, env: Env): Array[A]^ =>
-    env.out.print("range: ==> form:"+ from.string() +", to:"+to.string())
+  fun range(from: A, to: A): Array[A]^ =>
+    """
+    """
     let out = Array[A]
     // for i in Range[A](from, to) do
     //   out.push(i)
@@ -52,15 +53,18 @@ primitive Num[A: (Real[A] val & Number) = ISize]
     end
     out
 
-  fun range_i(from: A, to: A, env: Env): Array[A]^ =>
-    env.out.print("range_i: ==> form:"+ from.string() +", to:"+to.string())
+  fun range_i(from: A, to: A): Array[A]^ =>
+    """
+    """
     if from <= to then
-      range(from, inc(to, env), env)
+      range(from, inc(to))
     else
-      range(from, dec(to, env), env)
+      range(from, dec(to))
     end
 
   fun range_n(from: A, n: A): Array[A]^ =>
+    """
+    """
     let out = Array[A]
     // for i in Range[A](from, from + n) do
     //   out.push(i)

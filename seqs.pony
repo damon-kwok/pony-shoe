@@ -31,72 +31,8 @@ use "collections"
 use "random"
 use "debug"
 
-primitive Seqs[A: Seq[B] ref = Array[USize],
-  B: Comparable[B] #read = USize] is Sequence[A, B]
 
-type StrSeq is Seqs[String ref, U8]
-
-primitive HashSeqs[A: Seq[B] ref = Array[USize],
-  B: (Comparable[B] #read & Hashable #read & Equatable[B] #read) = USize]
-  is Sequence[A, B]
-
-  fun frequencies(a: A): Map[B, USize] =>
-    """
-    Returns a map with keys as unique elements of sequence and values as the
-    count of every element.
-
-    ````pony
-    let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
-    Seqs.frequencies(arr)
-    {"ant" => 3, "buffalo" => 2, "dingo" => 1}
-    """
-    var m = Map[B, USize]
-    for e in a.values() do
-      m(e) = m.get_or_else(e, 0) +1
-    end
-    m
-
-  fun frequencies_by(a: A, f_key: {(B): B} ): Map[B, USize] =>
-    """
-    Returns a map with keys as unique elements given by key_fun and values as the count of every element.
-
-    ````pony
-    let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
-    Seqs.frequencies(arr, {(i: USize): USize => i})
-    {"ant" => 3, "buffalo" => 2, "dingo" => 1}
-    ````
-    """
-    var m = Map[B, USize]
-    for e in a.values() do
-      let key = f_key(e)
-      m(key) = m.get_or_else(key, 0) +1
-    end
-    m
-
-  fun group_by(a: A, f_k: {(B): B}, f_v: {(B): B}): Map[B, A]^ =>
-    """
-    Splits the sequence into groups based on key_fun.
-
-    ````pony
-    let arr = Str.split("ant buffalo cat dingo"," ")
-    Seqs.group_by(arr, {(B): B => })
-    {3 => ["ant", "cat"], 5 => ["dingo"], 7 => ["buffalo"]}
-
-    Seqs.group_by(~w{ant buffalo cat dingo},
-          {(x:String):String=>x.size().string()},
-          {(x:String):String=>x.(0)})
-    {3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
-    ````
-    """
-    var m = Map[B, A]
-    for e in a.values() do
-      let k = f_k(e)
-      let v = f_v(e)
-      m(k) = m.get_or_else(k, a.create()).>push(v)
-    end
-    m
-
-trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
+primitive Seqs[A: Seq[B] ref = Array[U8], B: Comparable[B] #read = U8]
   """
   Provides a set of algorithms to work with `sequence`.
   In Pony, a `sequence` is any data type that implements the `interface seq[A]`.
@@ -111,31 +47,10 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     [1; 2; 3; 4; 5]
     ````
     """
-    // iftype A <: String then
-      // return a.clone()
-    // end
-
-    // iftype A <: List[B] then
-      // return a.clone()
-    // end
-
-    // iftype A <: Array[B] then
-      // return a.clone()
-    // end
-    // a.create()
-
-    // try
-      // (a as Cloneable[A]).clone()
-    // else
-      // a.create()
-    // end
-
     match a
-      | let a': Cloneable[A] => a'.clone()
-    else
-      a.create()
+      | let a': Cloneable[A] => return a'.clone()
     end
-
+    a.create()
 
   fun remove(a: A, i: USize) =>
     """
@@ -146,33 +61,10 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     [1; 2; 4; 5]
     ````
     """
-    /*
-    iftype A <: List[B] then
-      try a.remove(i)? end
-    end
-    iftype A <: Array[B] then
-      a.remove(i, 1)
-    end
-    iftype A <: String then
-      a.delete(i.isize_unsafe(), 1)
-    end
-    */
-
-    // try (a as List[B]).remove(i)? end
-    // try (a as Array[B]).remove(i, 1) end
-    // try (a as StringDelete).delete(i.isize_unsafe(), 1) end
-    // let typ = typeof(a)
-    // match typ
-      // | ListType  => try (a as List[B]).remove(i)? end
-      // | ArrayType => try (a as Array[B]).remove(i, 1) end
-      // | StringType => try (a as StringDelete).delete(i.isize_unsafe(), 1) end
-    // end
-
-    // let a': String => env.out.print(a)
     match a
-      | let a': List[B]  => try a'.remove(i)? end
-      | let a': Array[B] => a'.remove(i, 1)
-      | let a': StringDelete => a'.delete(i.isize_unsafe(), 1)
+    | let a': ListRemove[B]  => try a'.remove(i)? end
+    | let a': ArrayRemove => a'.remove(i, 1)
+    | let a': StringDelete => a'.delete(i.isize_unsafe(), 1)
     end
 
   // Basic
@@ -1485,6 +1377,23 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
 
   fun stair(a: A, f: ({(B)} | {(USize, B)} | {(USize, USize, B)}) ) =>
     """
+
+    ````pony
+    Seqs.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
+    'a'
+    'a' 'a'
+    'c' 'c' 'c'
+
+    fun output (i: USize, x: U32) {
+      let str = (i+1).string() + "x" + (i+1).string() + "="
+      let v= (i+1) * x
+      Debug.out(str+v.string())
+      }
+      Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
+      1x1=1
+      1x2=2 2x2=4
+      1x3=3 2x3=6 3x3=9
+    ````
     """
     for i in Range[USize](0, a.size()) do
       for j in Range[USize](0, i+1) do
@@ -1655,6 +1564,62 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
       out
     end
 
+    fun frequencies(a: A): AnyMap[B, USize] =>
+    """
+    Returns a map with keys as unique elements of sequence and values as the
+    count of every element.
+
+    ````pony
+    let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
+    Seqs.frequencies(arr)
+    {"ant" => 3, "buffalo" => 2, "dingo" => 1}
+    """
+    var m = AnyMap[B, USize]({(k: box->B!): USize => 0})
+    for e in a.values() do
+      m(e) = m.get_or_else(e, 0) +1
+    end
+    m
+
+  fun frequencies_by(a: A, f_key: {(B): B} ): AnyMap[B, USize] =>
+    """
+    Returns a map with keys as unique elements given by key_fun and values as the count of every element.
+
+    ````pony
+    let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
+    Seqs.frequencies(arr, {(i: USize): USize => i})
+    {"ant" => 3, "buffalo" => 2, "dingo" => 1}
+    ````
+    """
+    var m = AnyMap[B, USize]({(k: box->B!): USize => 0})
+    for e in a.values() do
+      let key = f_key(e)
+      m(key) = m.get_or_else(key, 0) +1
+    end
+    m
+
+  fun group_by(a: A, f_k: {(B): B}, f_v: {(B): B}): AnyMap[B, A]^ =>
+    """
+    Splits the sequence into groups based on key_fun.
+
+    ````pony
+    let arr = Str.split("ant buffalo cat dingo"," ")
+    Seqs.group_by(arr, {(B): B => })
+    {3 => ["ant", "cat"], 5 => ["dingo"], 7 => ["buffalo"]}
+
+    Seqs.group_by(~w{ant buffalo cat dingo},
+          {(x:String):String=>x.size().string()},
+          {(x:String):String=>x.(0)})
+    {3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
+    ````
+    """
+    var m = AnyMap[B, A]({(k: box->B!): USize => 0})
+    for e in a.values() do
+      let k = f_k(e)
+      let v = f_v(e)
+      m(k) = m.get_or_else(k, a.create()).>push(v)
+    end
+    m
+
   fun uniq(a: A) =>
     """
     Traverse the sequence, removing all duplicated elements.
@@ -1687,11 +1652,11 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     groups them together.
 
     ````pony
-    Seqs[Array[List[(String | U32)]], List[(String | U32)]].unzip([("a", 1), ("b", 2), ("c", 3)])
-    [("a", "b", "c"), (1, 2, 3)]
+    Seqs[Array[(String, U32)], (String, U32)].unzip([("a", 1); ("b", 2); ("c", 3)])
+    [["a"; "b"; "c"]; [1; 2; 3]]
 
-    Seqs[Array[Array[(String | U32)]], Array[(String | U32)]].unzip([["a", 1]; ["b", 2]; ["c", 3}]])
-    [["a"; "b"; "c"], [1; 2; 3]]
+    Seqs[Array[(String, U32)], (String, U32)].unzip([["a", 1]; ["b", 2]; ["c", 3}]])
+    [["a"; "b"; "c"]; [1; 2; 3]]
     ````
     """
     let out = Array[B]
@@ -1703,11 +1668,11 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     sequence of tuples.
 
     ````pony
-    Seqs.zip([[1, 2, 3], ['a', 'b', 'c'], ["foo", "bar", "baz"]])
-    [(1, 'a', "foo"), (2, 'b', "bar"), (3, 'c', "baz")]
+    Seqs.zip([[1; 2; 3]; ['a'; 'b'; 'c']; ["foo"; "bar"; "baz"]])
+    [(1, 'a', "foo"); (2, 'b', "bar"); (3, 'c', "baz")]
 
-    Seqs.zip([[1, 2, 3, 4, 5], ['a', 'b', 'c']])
-    [(1, 'a'), (2, 'b'), (3, 'c')]
+    Seqs.zip({[1; 2; 3; 4; 5], ['a'; 'b'; 'c']})
+    [(1, 'a'); (2, 'b'); (3, 'c')]
     ````
     """
 
@@ -1741,9 +1706,7 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
     """
     Print `sequence` debug info.
     """
-    // env.out.print("11111")
     let t = typeof(a)
-    // env.out.print("22222")
     var out = "[Trace] "
     var joiner = ","
     match t
@@ -1759,27 +1722,25 @@ trait Sequence[A: Seq[B] ref, B: Comparable[B] #read ]
       | UnknowType => out = out + "<Unknow type!> $ size:"+a.size().string()
     end
     out = out + join(a, joiner, f)
-    // env.out.print("22222")
     match t
       | ListType => out = out + "}"
       | ArrayType => out = out + "]"
       | StringType => out = out +"\""
     end
-    // env.out.print("3333")
-    //Debug.out(out)
-    // env.out.print(out)
+    // Debug.out(out)
+    env.out.print(out)
 
-// interface Cloneable[A: Seq[B] ref, B: Comparable[B] #read]
 interface Cloneable[A]
   fun clone(): A^
-interface StringDelete// is (Seq[U8] & Comparable[String box] & Stringable)
+
+interface StringDelete
   fun ref delete(offset: ISize, len: USize = 1)
 
-// interface ListRemove[A] is Seq[A]
-  // fun ref remove(i: USize): ListNode[A] ?
+interface ListRemove[A] is Seq[A]
+  fun ref remove(i: USize): ListNode[A] ?
 
-// interface ArrayRemove
-  // fun ref remove(i: USize, n: USize)
+interface ArrayRemove
+  fun ref remove(i: USize, n: USize)
 
 primitive ArrayType
 primitive ListType
