@@ -51,4 +51,4 @@ None is not an acceptable answer. There is always to option of not implementing 
 
 # Unresolved questions
 
-The `clone()` method has not been implemented.
+None.
