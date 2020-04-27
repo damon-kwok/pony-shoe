@@ -17,10 +17,10 @@
 *!This is just my scratch paper!*
 Note, Generic parameters are omitted from the example
 
-Prefab type alias:
-#+BEGIN_SRC pony
-type StrSeq is Seqs[String ref, U8]
-#+END_SRC
+# Prefab type alias:
+# #+BEGIN_SRC pony
+# type StrSeq is Seqs[String ref, U8]
+# #+END_SRC
 
 # // For example:
 # #+BEGIN_SRC pony
@@ -31,37 +31,37 @@ type StrSeq is Seqs[String ref, U8]
 
 *** Basic
 #+BEGIN_SRC pony
-Seqs.is_all([2; 4; 6], {(x: U32): Bool => x %% 2 == 0})
+Seqx.is_all([2; 4; 6], {(x: U32): Bool => x %% 2 == 0})
 true
 
-Seqs.is_all([2; 3; 4], {(x: U32): Bool => x %% 2 == 0})
+Seqx.is_all([2; 3; 4], {(x: U32): Bool => x %% 2 == 0})
 false
 
-Seqs.is_all([], {(x: U32): Bool => x > 0})
+Seqx.is_all([], {(x: U32): Bool => x > 0})
 true
 
-Seqs.is_any([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
+Seqx.is_any([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
 false
 
-Seqs.is_any([2; 3; 4], {(x: U32): Bool => x %% 2 == 1})
+Seqx.is_any([2; 3; 4], {(x: U32): Bool => x %% 2 == 1})
 true
 
-Seqs.is_any([], {(x: U32): Bool => x > 0})
+Seqx.is_any([], {(x: U32): Bool => x > 0})
 false
 
-Seqs.is_empty([])
+Seqx.is_empty([])
 true
 
-Seqs.is_empty([1; 2; 3])
+Seqx.is_empty([1; 2; 3])
 false
 
-Seqs.is_member([1; 2; 3; 4; 5; 6], 5)
+Seqx.is_member([1; 2; 3; 4; 5; 6], 5)
 true
 
-Seqs.is_member([1; 2; 3; 4; 5; 6], 7)
+Seqx.is_member([1; 2; 3; 4; 5; 6], 7)
 false
 
-Seqs.count([1; 2; 3; 4; 5; 6])
+Seqx.count([1; 2; 3; 4; 5; 6])
 6
 #+END_SRC
 
@@ -81,25 +81,25 @@ Seqs.each(["apple"; "orange"], {(x: String) => print(x)}, 2)
 "apple"
 "orange"
 
-Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2})
+Seqx.map([1; 2; 3], {(x: U32): U32 => x * 2})
 [2; 4; 6]
 
-Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2}, 2)
+Seqx.map([1; 2; 3], {(x: U32): U32 => x * 2}, 2)
 [4; 16; 36]
 
-Seqs.map([1; 2; 3; 4; 5], {(x: U32): U32 => x * x})
+Seqx.map([1; 2; 3; 4; 5], {(x: U32): U32 => x * x})
 [1; 4; 9, 16, 25]
 
-Seqs.map([1; 2; 3; 4; 5], {(i: USize, x: U32): U32 => x * x})
+Seqx.map([1; 2; 3; 4; 5], {(i: USize, x: U32): U32 => x * x})
 [1; 4; 9, 16, 25]
 
-Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
+Seqx.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
 [1; 3; 6; 10; 15]
 
-Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev*curr })
+Seqx.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev*curr })
 [1; 2; 6; 24; 120]
 
-Seqs.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
+Seqx.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
 'a'
 'a' 'a'
 'c' 'c' 'c'
@@ -109,21 +109,21 @@ Seqs.table(["name"], ["lucy", "lily"], {(col: String, row: String) => print(col+
 "name:lily"
 
 let f = {(col: U32, row: U32) => print(col*row) }
-Seqs.table(Num.range_i(1,3), Num.range_i(1,3), f)
+Seqx.table(Num.range_i(1,3), Num.range_i(1,3), f)
 1 2 3
 2 4 6
 3 6 9
 
-Seqs.matix([Num.range_i(1,9), Num.range_i(1,9)], Num.range_i(1,9)], f)
+Seqx.matix([Num.range_i(1,9), Num.range_i(1,9)], Num.range_i(1,9)], f)
 ...
 
-Seqs.skip([1; 2; 3; 4; 5; 6; 7], 1, {(x: U32) => print(x.string())})
+Seqx.skip([1; 2; 3; 4; 5; 6; 7], 1, {(x: U32) => print(x.string())})
 "1"
 "3"
 "5"
 "7"
 
-Seqs.skip([1; 2; 3; 4; 5; 6; 7], 2, {(i: USize, x: U32) => print(i.string()+":"+x.string())})
+Seqx.skip([1; 2; 3; 4; 5; 6; 7], 2, {(i: USize, x: U32) => print(i.string()+":"+x.string())})
 "0:1"
 "3:4"
 "6:7"
@@ -131,68 +131,68 @@ Seqs.skip([1; 2; 3; 4; 5; 6; 7], 2, {(i: USize, x: U32) => print(i.string()+":"+
 
 *** Find
 #+BEGIN_SRC pony
-Seqs.min([5; 6; 7; 3; 1; 2])
+Seqx.min([5; 6; 7; 3; 1; 2])
 1
 
-Seqs.max([5; 6; 7; 3; 1; 2])
+Seqx.max([5; 6; 7; 3; 1; 2])
 7
 
-Seqs.min_max([5; 6; 7; 3; 1; 2]
+Seqx.min_max([5; 6; 7; 3; 1; 2]
 (1, 7)
 
-Seqs.filter([1; 2; 3], {(x: B): Bool => x %% 2 == 0})
+Seqx.filter([1; 2; 3], {(x: B): Bool => x %% 2 == 0})
 [2]
 
-Seqs.first([1; 2; 3; 4; 5; 6])
+Seqx.first([1; 2; 3; 4; 5; 6])
 1
 
-Seqs.second([1; 2; 3; 4; 5; 6])
+Seqx.second([1; 2; 3; 4; 5; 6])
 2
 
-Seqs.at([1; 2; 3; 4; 5; 6], 3)
+Seqx.at([1; 2; 3; 4; 5; 6], 3)
 4
 
-Seqs.head([1; 2; 3; 4; 5; 6])
+Seqx.head([1; 2; 3; 4; 5; 6])
 [1]
 
-Seqs.tail([1; 2; 3; 4; 5; 6])
+Seqx.tail([1; 2; 3; 4; 5; 6])
 [2; 3; 4; 5; 6]
 #+END_SRC
 
 *** Sort
 #+BEGIN_SRC pony
 
-Seqs.swap([2; 3; 1; 5], 0, 2)
+Seqx.swap([2; 3; 1; 5], 0, 2)
 [1; 3; 2; 5]
 
-Seqs.reverse([1; 2; 3])
+Seqx.reverse([1; 2; 3])
 [3; 2; 1]
 
-Seqs.sort([2; 3; 1])
+Seqx.sort([2; 3; 1])
 [1; 2; 3]
 
-Seqs.sort_by(["some"; "kind"; "of"; "monster"], {(x: String): USize => x.size()})
+Seqx.sort_by(["some"; "kind"; "of"; "monster"], {(x: String): USize => x.size()})
 ["of"; "some"; "kind"; "monster"]
 
-Seqs.shuffle([1; 2; 3; 4; 5])
+Seqx.shuffle([1; 2; 3; 4; 5])
 [3; 1; 4; 2; 5]
 
-Seqs.rotation([1; 2; 3; 4; 5; 6; 7], 1)
+Seqx.rotation([1; 2; 3; 4; 5; 6; 7], 1)
 [7; 1; 2; 3; 4; 5; 6]
 
-Seqs.rotation({1, 2, 3, 4, 5, 6, 7}, 2)
+Seqx.rotation({1, 2, 3, 4, 5, 6, 7}, 2)
 {6, 7, 1, 2, 3, 4, 5}
 #+END_SRC
 
 *** Grouping
 #+BEGIN_SRC pony
-Seqs.chunk_by([1; 2; 2; 3; 4; 4; 6; 7; 7], {(x: U32): Bool => x%%2==1 })
+Seqx.chunk_by([1; 2; 2; 3; 4; 4; 6; 7; 7], {(x: U32): Bool => x%%2==1 })
 [[1]; [2; 2]; [3]; [4; 4; 6]; [7; 7]]
 
-Seqs.chunk_every([1; 2; 3; 4; 5; 6], 2)
+Seqx.chunk_every([1; 2; 3; 4; 5; 6], 2)
 [[1; 2]; [3; 4]; [5; 6]]
 
-Seqs.split([1, 2, 3], 2)
+Seqx.split([1, 2, 3], 2)
 [[1; 2]; [3]]
 #+END_SRC
 
@@ -288,7 +288,7 @@ Seqx.flat_map(['a', 'b', 'c'], {(x: U8): Array[Any] => [x; x]})
 Seqx.intersperse([1; 2; 3], 0)
 [1; 0; 2; 0; 3]
 
-Seqs[Array[String], String].with_index(["a"; "b"; "c"])
+Seqx[Array[String], String].with_index(["a"; "b"; "c"])
 [("a", 0); ("b", 1); ("c", 2)]
 
 Seqx.zip([[1; 2; 3]; ['a'; 'b'; 'c']; ["foo"; "bar"; "baz"]])
