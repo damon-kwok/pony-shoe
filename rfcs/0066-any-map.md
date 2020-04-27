@@ -26,6 +26,11 @@ actor Main
     map(1)="I"
     map(2)="love"
     map(3)="Pony"
+
+    let map2 = AnyMap[U8, String](object is HashFunction[U8]
+      fun hash(x: U8): USize => ...
+      fun eq(x: U8, y: U8): Bool => ...
+  end)
 ````
 
 # How We Test This
