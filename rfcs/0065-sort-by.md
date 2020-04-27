@@ -32,7 +32,7 @@ actor Main
 # How We Test This
 
 All test cases for `Sort` are also valid for `SortBy`. Its design and implementation are already complete and working.
-Source : https://github.com/damon-kwok/pony-shoe/blob/master/any_map.pony
+Source : https://github.com/damon-kwok/pony-shoe/blob/master/sort_by.pony
 
 # Drawbacks
 
