@@ -41,6 +41,11 @@ type AnyMap[K, V] is HashAnyMap[K, V]
   map(1)="I"
   map(2)="love"
   map(3)="Pony"
+
+  let map2 = AnyMap[U8, String](object is HashFunction[U8]
+      fun hash(x: U8): USize => ...
+      fun eq(x: U8, y: U8): Bool => ...
+  end)
   ````
   """
 
@@ -57,9 +62,11 @@ class HashAnyMap[K, V]
   """
   var _size: USize = 0
   var _array: Array[((K, V) | _MapEmpty | _MapDeleted)]
-  let _f_hash: {(box->K!): USize} val// = {(box->K!):USize}
-
-  new create(f: {(box->K!): USize} val, prealloc: USize = 6) =>
+  let _f_hash: ({(box->K!): USize} val | HashFunction[box->K!] val)
+  let _hash: HashFunction[box->K!] val
+  
+  new create(f: ({(box->K!): USize} val | HashFunction[box->K!] val),
+    prealloc: USize = 6) =>
     """
     Create an array with space for prealloc elements without triggering a
     resize. Defaults to 6.
@@ -68,6 +75,11 @@ class HashAnyMap[K, V]
     let n = len.max(8).next_pow2()
     _array = _array.init(_MapEmpty, n)
     _f_hash = f
+    _hash = object is HashFunction[box->K!]
+      fun apply(x: box->K!): USize => hash(x)
+      fun hash(x: box->K!): USize => 0
+      fun eq(x: box->K!, y: box->K!): Bool => true
+    end
 
   fun size(): USize =>
     """
@@ -357,7 +369,10 @@ class HashAnyMap[K, V]
     """
     var idx_del = _array.size()
     let mask = idx_del - 1
-    let h = _f_hash(key)
+    let h = match _f_hash
+    | let hash': {(box->K!): USize} val => hash'(key)
+    | let hash': HashFunction[box->K!] val => hash'.hash(key)
+    end
     var idx = h and mask
 
     try
@@ -366,9 +381,13 @@ class HashAnyMap[K, V]
 
         match entry
         | (let k: this->K!, _) =>
-          if _f_hash(k) == _f_hash(key) then
-            return (idx, true)
+          let eq' = match _f_hash
+          | let hash': {(box->K!): USize} val => hash'(k) == hash'(key)
+          | let hash': HashFunction[box->K!] val => hash'.eq(k, key)
           end
+          if eq' then
+            return (idx, true)
+        end
         | _MapEmpty =>
           if idx_del <= mask then
             return (idx_del, false)
