@@ -22,12 +22,12 @@ Prefab type alias:
 type StrSeq is Seqs[String ref, U8]
 #+END_SRC
 
-// For example:
-#+BEGIN_SRC pony
-let str = "hello,world".string()
-StrSeq.is_member(str, 'w')
-true
-#+END_SRC
+# // For example:
+# #+BEGIN_SRC pony
+# let str = "hello,world".string()
+# StrSeq.is_member(str, 'w')
+# true
+# #+END_SRC
 
 *** Basic
 #+BEGIN_SRC pony
@@ -184,7 +184,7 @@ Seqs.rotation({1, 2, 3, 4, 5, 6, 7}, 2)
 {6, 7, 1, 2, 3, 4, 5}
 #+END_SRC
 
-*** Split/Group
+*** Grouping
 #+BEGIN_SRC pony
 Seqs.chunk_by([1; 2; 2; 3; 4; 4; 6; 7; 7], {(x: U32): Bool => x%%2==1 })
 [[1]; [2; 2]; [3]; [4; 4; 6]; [7; 7]]
