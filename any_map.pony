@@ -3,7 +3,7 @@ any_map.pony ---  I love pony 🐎.
 Date: 2020-04-27
 
 Copyright (C) 2016-2020, The Pony Developers
-Copyright (C) 2003-2020 Damon kwok <damon-kwok@outlook.com>
+Copyright (C) 2003-2020 Damon Kwok <damon-kwok@outlook.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 use "collections"
 
 primitive _MapEmpty
@@ -56,9 +57,9 @@ class HashAnyMap[K, V]
   """
   var _size: USize = 0
   var _array: Array[((K, V) | _MapEmpty | _MapDeleted)]
-  let _f_hash: {(box->K!):USize}
+  let _f_hash: {(box->K!): USize} val// = {(box->K!):USize}
 
-  new create(f: {(box->K!): USize}, prealloc: USize = 6) =>
+  new create(f: {(box->K!): USize} val, prealloc: USize = 6) =>
     """
     Create an array with space for prealloc elements without triggering a
     resize. Defaults to 6.
@@ -280,27 +281,27 @@ class HashAnyMap[K, V]
       this(consume k) = consume v
     end
 
-  // fun add(
-    // key: this->K!,
-    // value: this->V!)
-    // : HashAnyMap[this->K!, this->V!]^
-  // =>
-    // """
-    // This with the new (key, value) mapping.
-    // """
-    // let r = clone()
-    // r(key) = value
-    // r
+  fun add(
+    key: this->K!,
+    value: this->V!)
+    : HashAnyMap[this->K!, this->V!]^
+  =>
+    """
+    This with the new (key, value) mapping.
+    """
+    let r = clone()
+    r(key) = value
+    r
 
-  // fun sub(key: this->K!)
-    // : HashAnyMap[this->K!, this->V!]^
-  // =>
-    // """
-    // This without the given key.
-    // """
-    // let r = clone()
-    // try r.remove(key)? end
-    // r
+  fun sub(key: this->K!)
+    : HashAnyMap[this->K!, this->V!]^
+  =>
+    """
+    This without the given key.
+    """
+    let r = clone()
+    try r.remove(key)? end
+    r
 
   fun next_index(prev: USize = -1): USize ? =>
     """
@@ -327,20 +328,19 @@ class HashAnyMap[K, V]
     """
     _resize(((_size * 4) / 3).next_pow2().max(8))
 
-  // fun clone()
-    // : HashAnyMap[this->K!, this->V!]^
-  // =>
+  fun clone()
+    : HashAnyMap[this->K!, this->V!]^
+  =>
     """
     Create a clone. The key and value types may be different due to aliasing
     and viewpoint adaptation.
     """
-    // let r = HashAnyMap[this->K!, this->V!](_f_hash, _size)
+    let r = HashAnyMap[this->K!, this->V!](_f_hash, _size)
 
-    // for (k, v) in pairs() do
-      // r(k) = v
-    // end
-    // r
-    // this
+    for (k, v) in pairs() do
+      r(k) = v
+    end
+    r
 
   fun ref clear() =>
     """
