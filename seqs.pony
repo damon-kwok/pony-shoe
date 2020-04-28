@@ -35,8 +35,8 @@ use "debug"
 primitive Seqs[A: Seq[B] ref = String ref,
   B: Comparable[B] #read = U8] is _Sequence[A, B]
 
-primitive Seqx[A: Seq[B] ref = Array[ISize],
-  B: Comparable[B] #read = ISize] is _Sequence[A, B]
+primitive Seqx[A: Seq[B] ref = Array[I32],
+  B: Comparable[B] #read = I32] is _Sequence[A, B]
 
 interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   """
@@ -75,7 +75,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   // Basic
 
-  fun is_all(a: A, f: {(B): Bool}): Bool =>
+  fun is_all(a: A, f: {(B): Bool} val): Bool =>
     """
     Returns true if fun.(element) is truthy for all elements in sequence.
 
@@ -95,7 +95,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     true
 
-  fun is_any(a: A, f: {(B): Bool}): Bool =>
+  fun is_any(a: A, f: {(B): Bool} val): Bool =>
     """
     Returns true if fun.(element) is truthy for at least one element in sequence.
 
@@ -155,7 +155,31 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     false
 
-  fun count(a: A, f: ({(B): Bool} | None) = None): USize =>
+  // fun count(a: A, f: ({(B): Bool} val | None val) = None): USize =>
+  //   """
+  //   Returns the count of elements in the sequence for which fun returns a truthy
+  //   value.
+
+  //   ````pony
+  //   Seqs.count([1; 2; 3])
+  //   3
+
+  //   Seqs.count([1; 2; 3; 4; 5], {(x: U32): Bool => x %% 2 == 0})
+  //   2
+  //   ````
+  //   """
+  //   match f
+  //     | let f': {(B): Bool} val =>
+  //       var n: USize = 0
+  //       for e in a.values() do
+  //         if f'(e) then n = n + 1 end
+  //       end
+  //       n
+  //   else
+  //     a.size()
+  //   end
+
+  fun count(a: A): USize =>
     """
     Returns the count of elements in the sequence for which fun returns a truthy
     value.
@@ -163,32 +187,25 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     ````pony
     Seqs.count([1; 2; 3])
     3
+    ````
+    """
+    a.size()
 
-    Seqs.count([1; 2; 3; 4; 5], {(x: U32): Bool => x %% 2 == 0})
+  fun count_by(a: A, f: {(B): Bool} val): USize =>
+    """
+    Returns the count of elements in the sequence for which fun returns a truthy
+    value.
+
+    ````pony
+    Seqs.count_by([1; 2; 3; 4; 5], {(x: U32): Bool => x %% 2 == 0})
     2
     ````
     """
-    match a
-      | let f': {(B): Bool} =>
-      var n: USize = 0
-      for e in a.values() do
-        if f'(e) then n = n + 1 end
-      end
-      n
-    else
-      a.size()
+    var n: USize = 0
+    for e in a.values() do
+      if f'(e) then n = n + 1 end
     end
-
-    // try
-      // let fn = (f as {(B): Bool})
-      // var n: USize = 0
-      // for e in a.values() do
-        // if fn(e) then n = n + 1 end
-      // end
-      // n
-    // else
-      // a.size()
-    // end
+    n
 
   fun first(a: A): B? =>
     """
@@ -344,7 +361,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     min_max(a)?._2
 
-  fun max_by(a: A, f_eval: {(B): USize}): B? =>
+  fun max_by(a: A, f_eval: {(B): USize} val): B? =>
     """
     Returns the maximal element in the sequence as calculated by the given fun.
 
@@ -369,7 +386,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     min_max(a)?._1
 
-  fun min_by(a: A, f_eval: {(B): USize}): B? =>
+  fun min_by(a: A, f_eval: {(B): USize} val): B? =>
     """
     Returns the minimal element in the sequence as calculated by the given fun.
 
@@ -403,7 +420,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun min_max_by(a: A, f_eval: {(B): USize}): (B, B)? =>
+  fun min_max_by(a: A, f_eval: {(B): USize} val): (B, B)? =>
     """
     Returns a tuple with the minimal and the maximal elements in the sequence
     as calculated by the given function.
@@ -432,7 +449,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun chunk_by(a: A, f: {(B): Bool}): Array[A]^ =>
+  fun chunk_by(a: A, f: {(B): Bool} val): Array[A]^ =>
     """
     Splits sequence on every element for which fun returns a new value.
 
@@ -489,7 +506,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     // starts step elements into the sequence.
     // """
 
-  fun chunk_while(a: A, acc: B, f_chunk: {(B): U8}, f_after: ({(B): B}|None)) =>
+  fun chunk_while(a: A, acc: B, f_chunk: {(B): U8} val, f_after: ({(B): B} val|None)) =>
     """
     Chunks the sequence with fine grained control when every chunk is emitted.
 
@@ -541,7 +558,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun split_while(a: A, f: {(B): Bool}): Array[A]^ =>
+  fun split_while(a: A, f: {(B): Bool} val): Array[A]^ =>
     """
     Splits sequence in two at the position of the element for which fun
     returns a falsy value (false or nil) for the first time.
@@ -574,7 +591,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun split_with(a: A, f: {(B): Bool}): Array[A]^ =>
+  fun split_with(a: A, f: {(B): Bool} val): Array[A]^ =>
     """
     Splits the sequence in two lists according to the given function fun.
 
@@ -669,7 +686,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun take_while(a: A, f: {(B): Bool}): A^ =>
+  fun take_while(a: A, f: {(B): Bool} val): A^ =>
     """
     Takes the elements from the beginning of the sequence while fun returns a
     truthy value.
@@ -726,7 +743,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     left
 
-  fun sum(a: A, f_add: {(B, B): B}): B? =>
+  fun sum(a: A, f_add: {(B, B): B} val): B? =>
     """
     Returns the sum of all elements.
 
@@ -741,7 +758,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun sum_by(a: A, f_add: {(B, B): B}): B? =>
+  fun sum_by(a: A, f_add: {(B, B): B} val): B? =>
     """
     Returns the sum of all elements.
 
@@ -756,6 +773,34 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
       out = f_add(out, a(i)?)
     end
     out
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Drop
+  fun uniq(a: A) =>
+    """
+    Traverse the sequence, removing all duplicated elements.
+
+    ````pony
+    Seqs.uniq([1, 5, 3, 3, 2, 3, 1, 5, 4])
+    [1, 5, 3, 2, 4]
+    ````
+    """
+
+  fun uniq_by(a: A, f: {(B, B): B} val) =>
+    """
+    Traverse the sequence, by removing the elements for which function fun
+    returned duplicate elements.
+
+    ````pony
+    Seqs[Array[(U32, String)], (U32, String)]
+    .uniq_by([(1, "x"); (2, "y"); (1, "z")], {(x, _) =-> x })
+    [{1, "x}, {2, "y}]
+
+    Seqs[Array[(String, List[(String | U32)])], (String, List[(String | U32)])]
+    .uniq_by([("a", {"tea", 2}); ("b", {"tea", 2}); ("c", {"coffee", 1})], fn {_, y} -> y end)
+    ["a" {"tea", 2}, "c" {"coffee", 1}]
+    ````
+    """
 
   fun dedup(a: A): A^ =>
     """
@@ -783,7 +828,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     a
 
-  fun dedup_by(a: A, f: {(B): B}): A^ =>
+  fun dedup_by(a: A, f: {(B): B} val): A^ =>
     """
     Traverse the sequence, returning a sequence where all consecutive duplicated
     elements are collapsed to a single element.
@@ -798,12 +843,12 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     if a.size() < 2 then a end
     try
-      // var v = if f is None then a(0)? else (f as {(B): B})(a(0)?) end
+      // var v = if f is None then a(0)? else (f as {(B): B} val)(a(0)?) end
       var v = f(a(0)?)
       var i: USize = 1
       for e in a.values() do
         if i == 0 then continue end
-          // var cur  = if f is None then e else (f as {(B): B})(e) end
+          // var cur  = if f is None then e else (f as {(B): B} val)(e) end
           var cur  = f(e)
           if v == cur then remove(a, i) else v = cur end
       end
@@ -875,7 +920,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     a
 
-  fun drop_while(a: A, f: {(B): Bool}): A^ =>
+  fun drop_while(a: A, f: {(B): Bool} val): A^ =>
     """
     Drops elements at the beginning of the sequence while fun returns a truthy value.
 
@@ -895,7 +940,9 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     a
 
-  fun filter(a: A, f: {(B): Bool}): A^ =>
+  //////////////////////////////////////////////////////////////////////////////
+  // Find
+  fun filter(a: A, f: {(B): Bool} val): A^ =>
     """
     Filters the sequence, i.e. returns only those elements for which fun
     returns a truthy value.
@@ -911,7 +958,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun find(a: A, f: {(B): Bool}, default: B): B^ =>
+  fun find(a: A, f: {(B): Bool} val, default: B): B^ =>
     """
     Returns the first element for which fun returns a truthy value.
     If no such element is found, returns default.
@@ -929,7 +976,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     default
 
-  fun find_index(a: A, f: {(B): Bool}): ISize =>
+  fun find_index(a: A, f: {(B): Bool} val): ISize =>
     """
     Similar to find, but returns the index (zero-based) of the element instead
     of the element itself.
@@ -949,7 +996,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     -1
 
-  fun find_value(a: A, f_value: {(B): Any}): Any^ =>
+  fun find_value(a: A, f_value: {(B): Any} val): Any^ =>
     """
     Similar to find, but returns the value of the function invocation instead
     of the element itself.
@@ -974,7 +1021,505 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     None
 
-  fun flat_map(a: A, f: {(B): Array[Any]}) =>
+  fun join(a: A, joiner: String = "", f_str: ({(B): String} val | None) = None): String =>
+    """
+    Joins the given sequence into a binary using joiner as a separator.
+
+    ````pony
+    Seqs.join([1; 2; 3])
+    "123"
+
+    Seqs.join([1; 2; 3], " = ")
+    "1 = 2 = 3"
+    ````
+    See also: `map_join`
+    ````pony
+    Seqs.map_join([1; 2; 3], "", {(x: U32): U32 => x * 2})
+    "246"
+
+    Seqs.map_join([1; 2; 3], " = ", {(x: U32): U32 => x * 2})
+    "2 = 4 = 6"
+    ````
+    """
+    var s: String = ""
+    var i: USize = 0
+    for e in a.values() do
+      match f_str
+        | let f_str': {(B): String} val => s = s + f_str'(e)
+      else
+        s = s + try (e as Stringable).string() else "*" end
+      end
+      if i < (a.size() - 1) then s = s.add(joiner) end
+      i = i + 1
+    end
+    s
+
+  fun map(a: A, f: ({(B): B} val | {(USize, B): B} val)): A^ =>
+    """
+    Returns a sequence where each element is the result of invoking fun on each
+    corresponding element of sequence.
+
+    ````pony
+    Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2})
+    [2; 4; 6]
+
+    Seqs.map([("a" 1); ("b" 2)], {(x: (String, U32)) => (x._1, -x._2)})
+    [("a" -1); ("b" -2)]
+    ````
+    """
+    var i: USize = 0
+
+    for e in a.values() do
+      match f
+        | let f': {(B): B} val => f'(e)
+        | let f': {(USize, B): B} val => f'(i, e)
+      end
+      i = i + 1
+    end
+    a
+
+  fun map_every(a: A, nth': USize, f: {(B): B} val): A^ =>
+    """
+    Returns a sequence of results of invoking fun on every nth' element of
+    sequence, starting with the first element.
+
+    ````pony
+    Seqs.map_every([1..10], 2, {(x: U32): U32 => x + 1000})
+    [1001, 2, 1003, 4, 1005, 6, 1007, 8, 1009, 10]
+
+    Seqs.map_every([1..10], 3, {(x: U32): U32 => x + 1000})
+    [1001, 2, 3, 1004, 5, 6, 1007, 8, 9, 1010]
+
+    Seqs.map_every([1..5], 0, {(x: U32): U32 => x + 1000})
+    [1, 2, 3, 4, 5]
+
+    Seqs.map_every([1; 2; 3], 1, {(x: U32): U32 => x + 1000})
+    [1001, 1002, 1003]
+    ````
+    """
+    var i: USize = 0
+    for e in a.values() do
+      if (i %% nth') == 0 then
+        try a(i)?= f(e) end
+      end
+      i = i + 1
+    end
+    a
+
+  fun map_intersperse(a: A, sep: B, f_mapper: {(B): B} val): A^ =>
+    """
+    Maps and intersperses the given sequence in one pass.
+
+    ````pony
+    Seqs[Array[(U32 | U8)], （(U32 | U8)].map_intersperse([1; 2; 3], 'a', {(x: U32): U32 => x * 2})
+    [2; 'a'; 4; 'a'; 6]
+    ````
+    """
+    var s = clone(a)
+    a.clear()
+    var i: USize = 0
+    for e in s.values() do
+      a.push(f_mapper(e))
+      if i < (s.size() -1 ) then a.push(sep) end
+      i = i + 1
+    end
+    a
+
+  fun map_join(a: A, joiner: String, f_mapper: {(B): B} val, f_str: ({(B): String} val | None) = None): String =>
+    """
+    Maps and joins the given sequence in one pass.
+
+    ````pony
+    Seqs.map_join([1; 2; 3], "", {(x: U32): U32 => x * 2})
+    "246"
+
+    Seqs.map_join([1; 2; 3], " = ", {(x: U32): U32 => x * 2})
+    "2 = 4 = 6"
+    ````
+    """
+    var s: String = ""
+    var i: USize = 0
+    for e in a.values() do
+      let e' = f_mapper(e)
+      match f_str
+        | let f_str': {(B): String} val => s = s + f_str'(e')
+      else
+        s = s + try (e' as Stringable).string() else "*" end
+      end
+      if i < (a.size() - 1) then s = s.add(joiner) end
+      i = i + 1
+    end
+    s
+
+  fun map_reduce(a: A, acc': B, f_mapper:{(B, B): (B, B)} val, f_add: {(B, B): B} val): (A, B) =>
+    """
+    Invokes the given function to each element in the sequence to reduce
+    it to a single element, while keeping an accumulator.
+
+    ````pony
+    map_reduce([1; 2; 3], 0, {(x: U32, acc: U32): U32 => (x * 2, x + acc)})
+    ([2; 4; 6], 6)
+    ````
+    """
+    var acc = acc'
+    for i in Range[USize](0, a.size()) do
+      try
+        let e = a(i)?
+        let e_tuple = f_mapper(e, acc)
+        // acc = (f_add as {(B, B): B} val)(acc, e_v)
+        a(i)? = e_tuple._1
+        acc = f_add(acc, e_tuple._2)
+      end
+    end
+    (a, acc)
+
+  fun reduce(a: A, acc': B, f: {(B, B): B} val): B =>
+    """
+    Invokes fun for each element in the sequence with the accumulator.
+
+    ````pony
+    Seqs.reduce([1; 2; 3], 0, {(x: U32, acc: U32):U32 => x + acc})
+    6
+    ````
+    """
+    var acc = acc'
+    try
+      for i in Range[USize](0, a.size()) do
+        let e = a(i)?
+        let e_v = f(e, acc)
+        acc = f(acc, e_v)
+      end
+    end
+    acc
+
+  fun reduce_while(a: A, acc: B, f: {(B, B): B} val) =>
+    """
+    Reduces sequence until fun returns {:halt, term}.
+
+    ````pony
+    Seqs.reduce_while([1..100], 0, fn x, acc => if x < 5 then acc + x else acc})
+    10
+
+    Seqs.reduce_while([1..100], 0, {(x: U32, acc: U32): U32 => if x > 0 then acc + x else acc})
+    5050
+    ````
+    """
+
+  fun reject(a: A, f: {(B): Bool} val) =>
+    """
+    Returns a sequence of elements in sequence excluding those for which the
+    function fun returns a truthy value.
+
+    ````pony
+    Seqs.reject([1; 2; 3], {(x:U32): U32 => x%%2 == 0})
+    [1; 3]
+    ````
+    """
+
+  fun reverse(a: A): A^ =>
+    """
+    Returns a sequence of elements in sequence in reverse order.
+
+    ````pony
+    Seqs.reverse([1; 2; 3])
+    [3; 2; 1]
+    ````
+    """
+    for i in Range[USize](0, a.size()/2) do
+      swap(a, i, a.size()-1-i)
+    end
+    a
+
+  fun reverse_slice(a: A, start_index: USize, amount: USize) =>
+    """
+    Reverses the sequence in the range from initial start_index through count
+    elements.
+
+    ````pony
+    let arr = Num[U32].range_i(1, 10)
+    Seqs.reverse_slice(arr, 5, 5)
+    [1; 2; 3; 4; 5; 10; 9; 8; 7; 6]
+    """
+    for i in Range[USize](0, amount/2) do
+      swap(a, start_index+i,  (start_index+amount) -1 -i)
+    end
+    a
+
+  fun swap(a: A, i: USize, j: USize): A^ =>
+    """
+    """
+    try
+      let tmp = a(i)?
+      a(i)? =  a(j)?
+      a(j)? = tmp
+    end
+    a
+
+  //============================================================================
+  //Traverse
+
+  fun each(a: A, f: ({(B)} val | {(USize, B)} val)) =>
+    """
+    Invokes the given fun for each element in the sequence.
+
+    ````pony
+    Seqs.each(["some"; "example"], {(x: String) => env.out.print(x)})
+    "some"
+    "example"
+    ````
+    """
+    var i: USize = 0
+    for e in a.values() do
+      match f
+        | let f': {(B)} val => f'(e)
+        | let f': {(USize, B)} val => i=i+1; f'(i, e)
+      end
+      // try (f as {(B)} val)(e) end
+      // try (f as {(USize, B)} val)(i ,e) end
+      // i = i+1
+    end
+
+  fun scan(a: A, f: ({(B, B): B} val | {(B, B, B): B} val)): A^ =>
+    """
+    Applies the given function to each element in the sequence, storing the
+    result in a sequence and passing it as the accumulator for the next computation.
+    Uses the first element in the sequence as the starting value.
+
+    ````pony
+    Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
+    [1; 3; 6; 10; 15]
+
+    let fiber = Array[USize]
+    Seqs.scan([1; 2; 3; 4; 5], {(prev2: U32, prev1: U32, curr: U32): U32 => fiber.push(prev2+prev1); curr })
+    [1; 3; 6; 10; 15]
+    ````
+    """
+    var start: USize = 1
+    match f
+        | let f': {(B, B, B): B} val => start=2
+    end
+    // try (f as {(B, B, B): B } val); start = 2 end
+
+    for i in Range[USize](start, a.size()) do
+        // try a(i)? = (f as {(B, B): B} val)(a(i-1)?, a(i)?) end
+        // try a(i)? = (f as {(B, B, B): B} val)(a(i-2)?, a(i-1)?, a(i)?) end
+        match f
+          | let f': {(B, B): B} val => try f'(a(i-1)?, a(i)?) end
+          | let f': {(B, B, B): B} val => try f'(a(i-2)?, a(i-1)?, a(i)?) end
+        end
+    end
+    a
+
+  fun skip(a: A, interval: USize, f: ({(B)} val | {(USize, B)} val) ) =>
+    """
+    """
+    for i in Range[USize](0, a.size()) do
+      if (i %% interval) == 0 then
+        // try (f as {(B)} val)(a(i)?) end
+        // try (f as {(USize, B)} val)(i, a(i)?) end
+        match f
+          | let f': {(B)} val => try f'(a(i)?) end
+          | let f': {(USize, B)} val => try f'(i, a(i)?) end
+        end
+      end
+    end
+
+  fun stair(a: A, f: ({(B)} val | {(USize, B)} val | {(USize, USize, B)} val) ) =>
+    """
+
+    ````pony
+    Seqs.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
+    'a'
+    'a' 'a'
+    'c' 'c' 'c'
+
+    fun output (i: USize, x: U32) {
+      let str = (i+1).string() + "x" + (i+1).string() + "="
+      let v= (i+1) * x
+      Debug.out(str+v.string())
+      }
+      Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
+      1x1=1
+      1x2=2 2x2=4
+      1x3=3 2x3=6 3x3=9
+    ````
+    """
+    for i in Range[USize](0, a.size()) do
+      for j in Range[USize](0, i+1) do
+        // try (f as {(B)} val)(a(i)?) end
+        // try (f as {(USize, B)} val)(i, a(i)?) end
+        // try (f as {(USize, USize, B)} val)(i, j, a(i)?) end
+        match f
+          | let f': {(B)} val => try f'(a(i)?) end
+          | let f': {(USize, B)} val => try f'(i, a(i)?) end
+          | let f': {(USize, USize, B)} val => try f'(i, j, a(i)?) end
+        end
+      end
+    end
+
+  fun table(cols: A, rows: A, f: ({(B, B)} val |{(USize, B, USize, B) } val) ) =>
+    """
+    """
+    for col in Range[USize](0, cols.size()) do
+      for row in Range[USize](0, rows.size()) do
+        // try (f as {(B, B)} val)(cols(col)?, rows(row)?) end
+        // try (f as {(USize, B, USize, B)} val)(col, cols(col)?, row, rows(row)?) end
+        match f
+         | let f': {(B, B)} val => try f'(cols(col)?, rows(row)?) end
+         | let f': {(USize, B, USize, B)} val =>try f'(col, cols(col)?, row, rows(row)?) end
+       end
+    end
+    end
+
+  fun matix(arr: Array[A]): Array[A]^ =>
+    """
+    """
+    arr
+
+  // fun scan(a: A, acc, fn) =>
+  // """Applies the given function to each element in the sequence, storing the result in a sequence and passing it as the accumulator for the next computation. Uses the given acc as the starting value."""
+
+  //============================================================================
+  // Reference
+  fun slice_range(a: A, from: USize, to: USize): A^ =>
+    """
+    Returns a subset sequence of the given sequence by index_range.
+
+    ````pony
+    Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 7)
+    [5; 6]
+
+    Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], -3, 2)
+    [7; 6; 5; 4; 3]
+    ````
+    """
+    let out = a.create()
+    out
+
+  fun slice(a: A, index: ISize, n: USize): A^ =>
+    """
+    Returns a subset sequence of the given sequence, from index (zero-based)
+    with amount number of elements if available.
+
+    ````pony
+    Seqs.slice([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 20)
+    [5; 6; 7; 8; 9]
+
+    Seqs.slice([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], -3, 2)
+    [7; 8]
+    ````
+    """
+    let start' = if (index + a.size().isize_unsafe()) < 0 then 0 else index.usize_unsafe() end
+    let start'': USize = if start' > a.size() then a.size() else start' end
+
+    let start: USize = (start'' + a.size()) %% a.size()
+    let out = a.create()
+    for i in Range[USize](start, start + n + 1) do
+      try out.push(a(i)?) end
+    end
+    out
+
+  //============================================================================
+  // Sort
+  fun sort(a: A): A^ =>
+    """
+    Sorts the sequence.
+
+    ````pony
+    Seqs.sort([2; 3; 1])
+    [1; 2; 3]
+    ````
+    """
+    Sort[A, B](a)
+    a
+
+  fun sort_by(a: A, f: {(B): USize} val): A^ =>
+    """
+    Sorts the sequence by the given function.
+
+    ````pony
+    Seqs.sort_by(["some"; "kind"; "of"; "monster"], {(a: String, b: String): Bool => a.size() > b.size()})
+    ["of"; "some"; "kind"; "monster"]
+    ````
+    """
+    SortBy[A, B](a, f)
+    a
+
+  fun shuffle(a: A): A^ =>
+    """
+    Returns a sequence with the elements of sequence shuffled.
+
+    ````pony
+    Seqs.shuffle([1; 2; 3; 4; 5])
+    [3; 1; 4; 2; 5]
+    ````
+    """
+    let mt = MT
+    var i: USize = a.size() - 1
+
+    while i > 1 do
+      let ceil = i = i - 1
+        swap(a,i, mt.int[USize](ceil))
+    end
+    a
+
+  fun rotation(a: A, n: USize): A^ =>
+    """
+    Returns a sequence with the elements of sequence shuffled.
+
+    ````pony
+    Seqs.rotation([1; 2; 3; 4; 5; 6; 7], 1)
+    [7; 1; 2; 3; 4; 5; 6]
+
+    Seqs.rotation({1, 2, 3, 4, 5, 6, 7}, 2)
+    {6, 7, 1, 2, 3, 4, 5}
+    ````
+    """
+    var i: USize = a.size() - 1
+
+    while i > 1 do
+      let ceil = i = i - 1
+      swap(a, i, ceil)
+    end
+    a
+
+  //============================================================================
+  // Convert / Transoform
+  fun to_list(a: A): List[B]^ =>
+    """
+    Converts sequence to a list.
+
+    ````pony
+    Seqs.to_list([1; 2; 3])
+    {1, 2, 3}
+    ````
+    """
+    try
+      (a as List[B])
+    else
+      let out = List[B](a.size())
+      for e in a.values() do out.push(e) end
+      out
+    end
+
+  fun to_array(a: A): Array[B]^ =>
+    """
+    Converts sequence to a array.
+
+    ````pony
+    Seqs.to_array({1, 2, 3})
+    [1; 2; 3]
+    ````
+    """
+    try
+      (a as Array[B])
+    else
+      let out = Array[B](a.size())
+      for e in a.values() do out.push(e) end
+      out
+    end
+
+    fun flat_map(a: A, f: {(B): Array[Any]} val) =>
     """
     Maps the given fun over sequence and flattens the result.
 
@@ -1049,24 +1594,24 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  // fun into(a: A, collectable) =>
-    // """
-    // Inserts the given sequence into a collectable.
+  fun into(a: A, collectable: A) =>
+    """
+    Inserts the given sequence into a collectable.
 
-    // ````pony
-    // Seqs.into([1, 2], [])
-    // [1, 2]
+    ````pony
+    Seqs.into([1, 2], [])
+    [1, 2]
 
-    // Seqs.into([a: 1, b: 2], %{})
-    // %{a: 1, b: 2}
+    Seqs.into(["a"; 1; "b"; 2], %{})
+    %{a: 1, b: 2}
 
-    // Seqs.into(%{a: 1}, %{b: 2})
-    // %{a: 1, b: 2}
+    Seqs.into(%{a: 1}, %{b: 2})
+    %{a: 1, b: 2}
 
-    // Seqs.into([a: 1, a: 2], %{})
-    // %{a: 2}
-    // ````
-    // """
+    Seqs.into([a: 1, a: 2], %{})
+    %{a: 2}
+    ````
+    """
 
   // fun into(a: A, collectable, transform) =>
     // """
@@ -1082,496 +1627,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     // ````
     // """
 
-  fun join(a: A, joiner: String = "", f_str: ({(B): String} | None) = None): String =>
-    """
-    Joins the given sequence into a binary using joiner as a separator.
-
-    ````pony
-    Seqs.join([1; 2; 3])
-    "123"
-
-    Seqs.join([1; 2; 3], " = ")
-    "1 = 2 = 3"
-    ````
-    See also: `map_join`
-    ````pony
-    Seqs.map_join([1; 2; 3], "", {(x: U32): U32 => x * 2})
-    "246"
-
-    Seqs.map_join([1; 2; 3], " = ", {(x: U32): U32 => x * 2})
-    "2 = 4 = 6"
-    ````
-    """
-    var s: String = ""
-    var i: USize = 0
-    for e in a.values() do
-      match f_str
-        | let f_str': {(B): String} => s = s + f_str'(e)
-      else
-        s = s + try (e as Stringable).string() else "*" end
-      end
-      if i < (a.size() - 1) then s = s.add(joiner) end
-      i = i + 1
-    end
-    s
-
-  fun map(a: A, f: ({(B): B} | {(USize, B): B})): A^ =>
-    """
-    Returns a sequence where each element is the result of invoking fun on each
-    corresponding element of sequence.
-
-    ````pony
-    Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2})
-    [2; 4; 6]
-
-    Seqs.map([("a" 1); ("b" 2)], {(x: (String, U32)) => (x._1, -x._2)})
-    [("a" -1); ("b" -2)]
-    ````
-    """
-    var i: USize = 0
-
-    for e in a.values() do
-      match f
-        | let f': {(B): B} => f'(e)
-        | let f': {(USize, B): B} => f'(i, e)
-      end
-      i = i + 1
-    end
-    a
-
-  fun map_every(a: A, nth': USize, f: {(B): B}): A^ =>
-    """
-    Returns a sequence of results of invoking fun on every nth' element of
-    sequence, starting with the first element.
-
-    ````pony
-    Seqs.map_every([1..10], 2, {(x: U32): U32 => x + 1000})
-    [1001, 2, 1003, 4, 1005, 6, 1007, 8, 1009, 10]
-
-    Seqs.map_every([1..10], 3, {(x: U32): U32 => x + 1000})
-    [1001, 2, 3, 1004, 5, 6, 1007, 8, 9, 1010]
-
-    Seqs.map_every([1..5], 0, {(x: U32): U32 => x + 1000})
-    [1, 2, 3, 4, 5]
-
-    Seqs.map_every([1; 2; 3], 1, {(x: U32): U32 => x + 1000})
-    [1001, 1002, 1003]
-    ````
-    """
-    var i: USize = 0
-    for e in a.values() do
-      if (i %% nth') == 0 then
-        try a(i)?= f(e) end
-      end
-      i = i + 1
-    end
-    a
-
-  fun map_intersperse(a: A, sep: B, f_mapper: {(B): B}): A^ =>
-    """
-    Maps and intersperses the given sequence in one pass.
-
-    ````pony
-    Seqs[Array[(U32 | U8)], （(U32 | U8)].map_intersperse([1; 2; 3], 'a', {(x: U32): U32 => x * 2})
-    [2; 'a'; 4; 'a'; 6]
-    ````
-    """
-    var s = clone(a)
-    a.clear()
-    var i: USize = 0
-    for e in s.values() do
-      a.push(f_mapper(e))
-      if i < (s.size() -1 ) then a.push(sep) end
-      i = i + 1
-    end
-    a
-
-  fun map_join(a: A, joiner: String, f_mapper: {(B): B}, f_str: ({(B): String} | None) = None): String =>
-    """
-    Maps and joins the given sequence in one pass.
-
-    ````pony
-    Seqs.map_join([1; 2; 3], "", {(x: U32): U32 => x * 2})
-    "246"
-
-    Seqs.map_join([1; 2; 3], " = ", {(x: U32): U32 => x * 2})
-    "2 = 4 = 6"
-    ````
-    """
-    var s: String = ""
-    var i: USize = 0
-    for e in a.values() do
-      let e' = f_mapper(e)
-      match f_str
-        | let f_str': {(B): String} => s = s + f_str'(e')
-      else
-        s = s + try (e' as Stringable).string() else "*" end
-      end
-      if i < (a.size() - 1) then s = s.add(joiner) end
-      i = i + 1
-    end
-    s
-
-  fun map_reduce(a: A, acc': B, f_mapper:{(B, B): (B, B)}, f_add: {(B, B): B}): (A, B) =>
-    """
-    Invokes the given function to each element in the sequence to reduce
-    it to a single element, while keeping an accumulator.
-
-    ````pony
-    map_reduce([1; 2; 3], 0, {(x: U32, acc: U32): U32 => (x * 2, x + acc)})
-    ([2; 4; 6], 6)
-    ````
-    """
-    var acc = acc'
-    for i in Range[USize](0, a.size()) do
-      try
-        let e = a(i)?
-        let e_tuple = f_mapper(e, acc)
-        // acc = (f_add as {(B, B): B})(acc, e_v)
-        a(i)? = e_tuple._1
-        acc = f_add(acc, e_tuple._2)
-      end
-    end
-    (a, acc)
-
-  fun reduce(a: A, acc': B, f: {(B, B): B}): B =>
-    """
-    Invokes fun for each element in the sequence with the accumulator.
-
-    ````pony
-    Seqs.reduce([1; 2; 3], 0, {(x: U32, acc: U32):U32 => x + acc})
-    6
-    ````
-    """
-    var acc = acc'
-    try
-      for i in Range[USize](0, a.size()) do
-        let e = a(i)?
-        let e_v = f(e, acc)
-        acc = f(acc, e_v)
-      end
-    end
-    acc
-
-  fun reduce_while(a: A, acc: B, f: {(B, B): B}) =>
-    """
-    Reduces sequence until fun returns {:halt, term}.
-
-    ````pony
-    Seqs.reduce_while([1..100], 0, fn x, acc => if x < 5 then acc + x else acc})
-    10
-
-    Seqs.reduce_while([1..100], 0, {(x: U32, acc: U32): U32 => if x > 0 then acc + x else acc})
-    5050
-    ````
-    """
-
-  fun reject(a: A, f: {(B): Bool}) =>
-    """
-    Returns a sequence of elements in sequence excluding those for which the
-    function fun returns a truthy value.
-
-    ````pony
-    Seqs.reject([1; 2; 3], {(x:U32): U32 => x%%2 == 0})
-    [1; 3]
-    ````
-    """
-
-  fun reverse(a: A): A^ =>
-    """
-    Returns a sequence of elements in sequence in reverse order.
-
-    ````pony
-    Seqs.reverse([1; 2; 3])
-    [3; 2; 1]
-    ````
-    """
-    for i in Range[USize](0, a.size()/2) do
-      swap(a, i, a.size()-1-i)
-    end
-    a
-
-  fun reverse_slice(a: A, start_index: USize, amount: USize) =>
-    """
-    Reverses the sequence in the range from initial start_index through count
-    elements.
-
-    ````pony
-    let arr = Num[U32].range_i(1, 10)
-    Seqs.reverse_slice(arr, 5, 5)
-    [1; 2; 3; 4; 5; 10; 9; 8; 7; 6]
-    """
-    for i in Range[USize](0, amount/2) do
-      swap(a, start_index+i,  (start_index+amount) -1 -i)
-    end
-    a
-
-  fun swap(a: A, i: USize, j: USize): A^ =>
-    """
-    """
-    try
-      let tmp = a(i)?
-      a(i)? =  a(j)?
-      a(j)? = tmp
-    end
-    a
-
-  fun each(a: A, f: ({(B)} | {(USize, B)})) =>
-    """
-    Invokes the given fun for each element in the sequence.
-
-    ````pony
-    Seqs.each(["some"; "example"], {(x: String) => env.out.print(x)})
-    "some"
-    "example"
-    ````
-    """
-    var i: USize = 0
-    for e in a.values() do
-      match f
-        | let f': {(B)} => f'(e)
-        | let f': {(USize, B)} => i=i+1; f'(i, e)
-      end
-      // try (f as {(B)})(e) end
-      // try (f as {(USize, B)})(i ,e) end
-      // i = i+1
-    end
-
-  fun scan(a: A, f: ({(B, B): B} | {(B, B, B): B})): A^ =>
-    """
-    Applies the given function to each element in the sequence, storing the
-    result in a sequence and passing it as the accumulator for the next computation.
-    Uses the first element in the sequence as the starting value.
-
-    ````pony
-    Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
-    [1; 3; 6; 10; 15]
-
-    let fiber = Array[USize]
-    Seqs.scan([1; 2; 3; 4; 5], {(prev2: U32, prev1: U32, curr: U32): U32 => fiber.push(prev2+prev1); curr })
-    [1; 3; 6; 10; 15]
-    ````
-    """
-    var start: USize = 1
-    match f
-        | let f': {(B, B, B): B} => start=2
-    end
-    // try (f as {(B, B, B): B }); start = 2 end
-
-    for i in Range[USize](start, a.size()) do
-        // try a(i)? = (f as {(B, B): B})(a(i-1)?, a(i)?) end
-        // try a(i)? = (f as {(B, B, B): B})(a(i-2)?, a(i-1)?, a(i)?) end
-        match f
-          | let f': {(B, B): B} => try f'(a(i-1)?, a(i)?) end
-          | let f': {(B, B, B): B} => try f'(a(i-2)?, a(i-1)?, a(i)?) end
-        end
-    end
-    a
-
-  fun skip(a: A, interval: USize, f: ({(B)} | {(USize, B)}) ) =>
-    """
-    """
-    for i in Range[USize](0, a.size()) do
-      if (i %% interval) == 0 then
-        // try (f as {(B)})(a(i)?) end
-        // try (f as {(USize, B)})(i, a(i)?) end
-        match f
-          | let f': {(B)} => try f'(a(i)?) end
-          | let f': {(USize, B)} => try f'(i, a(i)?) end
-        end
-      end
-    end
-
-  fun stair(a: A, f: ({(B)} | {(USize, B)} | {(USize, USize, B)}) ) =>
-    """
-
-    ````pony
-    Seqs.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
-    'a'
-    'a' 'a'
-    'c' 'c' 'c'
-
-    fun output (i: USize, x: U32) {
-      let str = (i+1).string() + "x" + (i+1).string() + "="
-      let v= (i+1) * x
-      Debug.out(str+v.string())
-      }
-      Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
-      1x1=1
-      1x2=2 2x2=4
-      1x3=3 2x3=6 3x3=9
-    ````
-    """
-    for i in Range[USize](0, a.size()) do
-      for j in Range[USize](0, i+1) do
-        // try (f as {(B)})(a(i)?) end
-        // try (f as {(USize, B)})(i, a(i)?) end
-        // try (f as {(USize, USize, B)})(i, j, a(i)?) end
-        match f
-          | let f': {(B)} => try f'(a(i)?) end
-          | let f': {(USize, B)} => try f'(i, a(i)?) end
-          | let f': {(USize, USize, B)} => try f'(i, j, a(i)?) end
-        end
-      end
-    end
-
-  fun table(cols: A, rows: A, f: ({(B, B)} |{(USize, B, USize, B) }) ) =>
-    """
-    """
-    for col in Range[USize](0, cols.size()) do
-      for row in Range[USize](0, rows.size()) do
-        // try (f as {(B, B)})(cols(col)?, rows(row)?) end
-        // try (f as {(USize, B, USize, B)})(col, cols(col)?, row, rows(row)?) end
-        match f
-         | let f': {(B, B)} => try f'(cols(col)?, rows(row)?) end
-         | let f': {(USize, B, USize, B)} =>try f'(col, cols(col)?, row, rows(row)?) end
-       end
-    end
-    end
-
-  fun matix(arr: Array[A]): Array[A]^ =>
-    """
-    """
-    arr
-
-  // fun scan(a: A, acc, fn) =>
-  // """Applies the given function to each element in the sequence, storing the result in a sequence and passing it as the accumulator for the next computation. Uses the given acc as the starting value."""
-
-  fun slice_range(a: A, from: USize, to: USize): A^ =>
-    """
-    Returns a subset sequence of the given sequence by index_range.
-
-    ````pony
-    Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 7)
-    [5; 6]
-
-    Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], -3, 2)
-    [7; 6; 5; 4; 3]
-    ````
-    """
-    let out = a.create()
-    out
-
-  fun slice(a: A, index: ISize, n: USize): A^ =>
-    """
-    Returns a subset sequence of the given sequence, from index (zero-based)
-    with amount number of elements if available.
-
-    ````pony
-    Seqs.slice([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 20)
-    [5; 6; 7; 8; 9]
-
-    Seqs.slice([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], -3, 2)
-    [7; 8]
-    ````
-    """
-    let start' = if (index + a.size().isize_unsafe()) < 0 then 0 else index.usize_unsafe() end
-    let start'': USize = if start' > a.size() then a.size() else start' end
-
-    let start: USize = (start'' + a.size()) %% a.size()
-    let out = a.create()
-    for i in Range[USize](start, start + n + 1) do
-      try out.push(a(i)?) end
-    end
-    out
-
-  fun sort(a: A): A^ =>
-    """
-    Sorts the sequence.
-
-    ````pony
-    Seqs.sort([2; 3; 1])
-    [1; 2; 3]
-    ````
-    """
-    Sort[A, B](a)
-    a
-
-  fun sort_by(a: A, f: {(B): USize}): A^ =>
-    """
-    Sorts the sequence by the given function.
-
-    ````pony
-    Seqs.sort_by(["some"; "kind"; "of"; "monster"], {(a: String, b: String): Bool => a.size() > b.size()})
-    ["of"; "some"; "kind"; "monster"]
-    ````
-    """
-    SortBy[A, B](a, f)
-    a
-
-  fun shuffle(a: A): A^ =>
-    """
-    Returns a sequence with the elements of sequence shuffled.
-
-    ````pony
-    Seqs.shuffle([1; 2; 3; 4; 5])
-    [3; 1; 4; 2; 5]
-    ````
-    """
-    let mt = MT
-    var i: USize = a.size() - 1
-
-    while i > 1 do
-      let ceil = i = i - 1
-        swap(a,i, mt.int[USize](ceil))
-    end
-    a
-
-  fun rotation(a: A, n: USize): A^ =>
-    """
-    Returns a sequence with the elements of sequence shuffled.
-
-    ````pony
-    Seqs.rotation([1; 2; 3; 4; 5; 6; 7], 1)
-    [7; 1; 2; 3; 4; 5; 6]
-
-    Seqs.rotation({1, 2, 3, 4, 5, 6, 7}, 2)
-    {6, 7, 1, 2, 3, 4, 5}
-    ````
-    """
-    var i: USize = a.size() - 1
-
-    while i > 1 do
-      let ceil = i = i - 1
-      swap(a, i, ceil)
-    end
-    a
-
-  fun to_list(a: A): List[B]^ =>
-    """
-    Converts sequence to a list.
-
-    ````pony
-    Seqs.to_list([1; 2; 3])
-    {1, 2, 3}
-    ````
-    """
-    try
-      (a as List[B])
-    else
-      let out = List[B](a.size())
-      for e in a.values() do out.push(e) end
-      out
-    end
-
-  fun to_array(a: A): Array[B]^ =>
-    """
-    Converts sequence to a array.
-
-    ````pony
-    Seqs.to_array({1, 2, 3})
-    [1; 2; 3]
-    ````
-    """
-    try
-      (a as Array[B])
-    else
-      let out = Array[B](a.size())
-      for e in a.values() do out.push(e) end
-      out
-    end
-
-    fun frequencies(a: A): AnyMap[B, USize] =>
+  fun frequencies(a: A): AnyMap[B, USize] =>
     """
     Returns a map with keys as unique elements of sequence and values as the
     count of every element.
@@ -1581,13 +1637,13 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Seqs.frequencies(arr)
     {"ant" => 3, "buffalo" => 2, "dingo" => 1}
     """
-    var m = AnyMap[B, USize]({(k: box->B!): USize => 0})
+    var m = AnyMap[B, USize]({(k: box->B!): USize => 0} val)
     for e in a.values() do
       m(e) = m.get_or_else(e, 0) +1
     end
     m
 
-  fun frequencies_by(a: A, f_key: {(B): B} ): AnyMap[B, USize] =>
+  fun frequencies_by(a: A, f_key: {(B): B} val ): AnyMap[B, USize] =>
     """
     Returns a map with keys as unique elements given by key_fun and values as the count of every element.
 
@@ -1597,14 +1653,14 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     {"ant" => 3, "buffalo" => 2, "dingo" => 1}
     ````
     """
-    var m = AnyMap[B, USize]({(k: box->B!): USize => 0})
+    var m = AnyMap[B, USize]({(k: box->B!): USize => 0} val)
     for e in a.values() do
       let key = f_key(e)
       m(key) = m.get_or_else(key, 0) +1
     end
     m
 
-  fun group_by(a: A, f_k: {(B): B}, f_v: {(B): B}): AnyMap[B, A]^ =>
+  fun group_by(a: A, f_k: {(B): B} val, f_v: {(B): B} val): AnyMap[B, A]^ =>
     """
     Splits the sequence into groups based on key_fun.
 
@@ -1613,45 +1669,20 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Seqs.group_by(arr, {(B): B => })
     {3 => ["ant", "cat"], 5 => ["dingo"], 7 => ["buffalo"]}
 
-    Seqs.group_by(~w{ant buffalo cat dingo},
+    let arr2 = Str.split("ant buffalo cat dingo", "")
+    Seqs.group_by(arr2,
           {(x:String):String=>x.size().string()},
           {(x:String):String=>x.(0)})
     {3 => ["a", "c"], 5 => ["d"], 7 => ["b"]}
     ````
     """
-    var m = AnyMap[B, A]({(k: box->B!): USize => 0})
+    var m = AnyMap[B, A]({(k: box->B!): USize => 0} val)
     for e in a.values() do
       let k = f_k(e)
       let v = f_v(e)
       m(k) = m.get_or_else(k, a.create()).>push(v)
     end
     m
-
-  fun uniq(a: A) =>
-    """
-    Traverse the sequence, removing all duplicated elements.
-
-    ````pony
-    Seqs.uniq([1, 5, 3, 3, 2, 3, 1, 5, 4])
-    [1, 5, 3, 2, 4]
-    ````
-    """
-
-  fun uniq_by(a: A, f: {(B, B): B}) =>
-    """
-    Traverse the sequence, by removing the elements for which function fun
-    returned duplicate elements.
-
-    ````pony
-    Seqs[Array[(U32, String)], (U32, String)]
-    .uniq_by([(1, "x"); (2, "y"); (1, "z")], {(x, _) =-> x })
-    [{1, "x}, {2, "y}]
-
-    Seqs[Array[(String, List[(String | U32)])], (String, List[(String | U32)])]
-    .uniq_by([("a", {"tea", 2}); ("b", {"tea", 2}); ("c", {"coffee", 1})], fn {_, y} -> y end)
-    ["a" {"tea", 2}, "c" {"coffee", 1}]
-    ````
-    """
 
   fun unzip(a: A): Array[B] =>
     """
@@ -1709,7 +1740,7 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     UnknowType
 
-  fun trace(a: A, env: Env, f: ({(B): String} | None) = None) =>
+  fun trace(a: A, env: Env, f: ({(B): String} val | None) = None) =>
     """
     Print `sequence` debug info.
     """
@@ -1718,14 +1749,14 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     var joiner = ","
     match t
       | ListType =>
-      joiner = ","
-      out = out + "List => size:"+a.size().string() + " {"
+        joiner = ","
+        out = out + "List => size:"+a.size().string() + " {"
       | ArrayType =>
-      joiner = ";"
-      out = out + "Array => size:"+a.size().string() + " ["
+        joiner = ";"
+        out = out + "Array => size:"+a.size().string() + " ["
       | StringType =>
-      joiner = ""
-      out = out + "String => size:"+a.size().string() + " \""
+        joiner = ""
+        out = out + "String => size:"+a.size().string() + " \""
       | UnknowType => out = out + "<Unknow type!> $ size:"+a.size().string()
     end
     out = out + join(a, joiner, f)

@@ -64,14 +64,14 @@ primitive SortBy[A: Seq[B] ref = Array[String], B: Any #read = String]
       end
   ```
   """
-  fun apply(a: A, f: {(B): USize}): A^ =>
+  fun apply(a: A, f: {(B): USize} val): A^ =>
     """
     Sort the given seq.
     """
     try _sort(a, 0, a.size().isize() - 1, f)? end
     a
 
-  fun _sort(a: A, lo: ISize, hi: ISize, f: {(B): USize}) ? =>
+  fun _sort(a: A, lo: ISize, hi: ISize, f: {(B): USize} val) ? =>
     if hi <= lo then return end
     // choose outermost elements as pivots
     if f(a(lo.usize())?) > f(a(hi.usize())?) then _swap(a, lo, hi)? end
