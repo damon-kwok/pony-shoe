@@ -35,7 +35,7 @@ primitive _MapDeleted
 type AnyMap[K, V] is HashAnyMap[K, V]
   """
   This is a map that uses structural equality on the key.
-  
+
   ````pony
   let map = AnyMap[U8, String]({(key: U8): USize => key.usize_unsafe()})
   map(1)="I"
@@ -63,9 +63,13 @@ class HashAnyMap[K, V]
   var _size: USize = 0
   var _array: Array[((K, V) | _MapEmpty | _MapDeleted)]
   let _f_hash: ({(box->K!): USize} val | HashFunction[box->K!] val)
-  let _hash: HashFunction[box->K!] val
-  
-  new create(f: ({(box->K!): USize} val | HashFunction[box->K!] val),
+
+  new create(f: ({(box->K!): USize} val | HashFunction[box->K!] val)
+    = {(key: box->K!): USize =>
+    match key
+      | let key': HashFunction[box->K!] val => key'.hash(key)
+      | let key': Hashable val => key'.hash()
+    end; 0} val,
     prealloc: USize = 6) =>
     """
     Create an array with space for prealloc elements without triggering a
@@ -75,11 +79,6 @@ class HashAnyMap[K, V]
     let n = len.max(8).next_pow2()
     _array = _array.init(_MapEmpty, n)
     _f_hash = f
-    _hash = object is HashFunction[box->K!]
-      fun apply(x: box->K!): USize => hash(x)
-      fun hash(x: box->K!): USize => 0
-      fun eq(x: box->K!, y: box->K!): Bool => true
-    end
 
   fun size(): USize =>
     """
