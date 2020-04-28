@@ -30,6 +30,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 use "collections"
 
 type AnySet[A: Any #read] is HashAnySet[A]
+  """
+  A set, built on top of a HashMap. This is implemented as map of an alias of
+  a type to itself
+
+  ````pony
+  let a = AnySet[U8]
+    a.set(1)
+    a.set(2)
+
+  let b = AnySet[U8]({(k: CustomType): Usize => ... hash k})
+    a.set(1)
+    a.set(2)
+
+  let c = AnyMap[CustomType](object is HashFunction[CustomType]
+    fun hash(x: CustomType): USize => ...
+    fun eq(x: CustomType, y: CustomType): Bool => ...
+  end)
+  ````
+  """
 
 type AnySetIs[A: Any #read] is HashAnySet[A]
 
