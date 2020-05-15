@@ -75,3 +75,55 @@ primitive Num[A: (Real[A] val & Number) = I32]
       out.push(i)
     end
     out
+
+  fun print2(a: A, stream: (OutStream | None) = None) =>
+    match stream
+      | let stream': OutStream => stream'.print(a.string())
+      | None => Debug.out(a.string()+"\n")
+    end
+
+  fun print(a: A): A =>
+    Debug.out(a.string()+"\n")
+    a
+
+  fun write(a: A, stream: (OutStream | None) = None)  =>
+    match stream
+      | let stream': OutStream => stream'.write(a.string())
+      | None => Debug.out(a)
+    end
+
+  fun copy(x: USize, a: A): Array[A]^ =>
+    let out = Array[A]
+    out.push(a)
+    for i in Range[USize](0, x) do
+      out.push(a)
+    end
+    out
+
+  fun is_even(a: A): Bool => (a%%2) == 0
+  fun is_odd(a: A): Bool => (a%%2) == 1
+  fun double(a: A): A => a*2
+  fun half(a: A): A => a/2
+  fun sqr(a: A): A => a*a
+  fun pow(n: USize, a: A): A =>
+    if n<2 then return a end
+    var out: A = a
+    for i in Range[USize](0, n-1) do
+      out = out *a
+    end
+    out
+
+
+  fun add(a: A, b: A): A => a+b
+  fun sub(a: A, b: A): A => a-b
+  fun mul(a: A, b: A): A => a*b
+  fun div(a: A, b: A): A => a/b
+  fun rem(a: A, b: A): A => a%b
+  fun mod(a: A, b: A): A => a%%b
+
+  fun eq(a: A, b: A): Bool => a==b
+  fun ne(a: A, b: A): Bool => a!=b
+  fun lt(a: A, b: A): Bool => a<b
+  fun le(a: A, b: A): Bool => a<=b
+  fun ge(a: A, b: A): Bool => a>=b
+  fun gt(a: A, b: A): Bool => a>b

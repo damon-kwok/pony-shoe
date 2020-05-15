@@ -14,7 +14,8 @@
 # let map  = <"a":1, "b":2, "c":3>      // Map Literals
 # #+END_SRC
 
-*!This is just my scratch paper!*
+*!This is just my scratch!*
+
 Note, Generic parameters are omitted from the example
 
 # Prefab type alias:
@@ -31,22 +32,22 @@ Note, Generic parameters are omitted from the example
 
 *** Basic
 #+BEGIN_SRC pony
-Seqx.is_all([2; 4; 6], {(x: I32): Bool => x %% 2 == 0})
+Seqx.is_all([2; 4; 6], Num~is_enev())
 true
 
-Seqx.is_all([2; 3; 4], {(x: I32): Bool => x %% 2 == 0})
+Seqx.is_all([2; 3; 4], Num~is_enev())
 false
 
-Seqx.is_all([], {(x: I32): Bool => x > 0})
+Seqx.is_all([], Num~gt(0))
 true
 
-Seqx.is_any([2; 4; 6], {(x: I32): Bool => x %% 2 == 1})
+Seqx.is_any([2; 4; 6], Num~is_odd())
 false
 
-Seqx.is_any([2; 3; 4], {(x: I32): Bool => x %% 2 == 1})
+Seqx.is_any([2; 3; 4], Num~is_odd())
 true
 
-Seqx.is_any([], {(x: I32): Bool => x > 0})
+Seqx.is_any([], Num~gt(0))
 false
 
 Seqx.is_empty([])
@@ -64,7 +65,7 @@ false
 Seqx.count([1; 2; 3; 4; 5; 6])
 6
 
-Seqx.count_by([1; 2; 3; 4; 5; 6], {(x: I32): Bool => x > 3})
+Seqx.count_by([1; 2; 3; 4; 5; 6], Num~gt(3))
 3
 #+END_SRC
 
@@ -87,20 +88,23 @@ Seqs.each(["apple"; "orange"], {(x: String) => print(x)}, 2)
 Seqx.map([1; 2; 3], {(x: I32): I32 => x * 2})
 [2; 4; 6]
 
-Seqx.map([1; 2; 3], {(x: I32): I32 => x * 2}, 2)
-[4; 16; 36]
+Seqx.map([1; 2; 3], Num~mul(2))
+[2; 4; 6]
 
-Seqx.map([1; 2; 3; 4; 5], {(x: I32): I32 => x * x})
-[1; 4; 9, 16, 25]
+Seqx.map([1; 2; 3], Num~mul(2), 2)
+[4; 8; 12]
 
 Seqx.map([1; 2; 3; 4; 5], {(i: USize, x: I32): I32 => x * x})
 [1; 4; 9, 16, 25]
 
-Seqx.scan([1; 2; 3; 4; 5], {(prev: I32, curr: I32): I32 => prev+curr })
+Seqx.map([1; 2; 3; 4; 5], Num~sqr())
+[1; 4; 9, 16, 25]
+
+Seqx.scan([1; 2; 3; 4; 5], Num~add())
 [1; 3; 6; 10; 15]
 
 Seqx.scan([1; 2; 3; 4; 5], {(prev: I32, curr: I32): I32 => prev*curr })
-[1; 2; 6; 24; 120]
+[1; 3; 6; 10; 15]
 
 Seqx.stair(['a'; 'b'; 'c'], {(x: I32) => print(x)})
 'a'
@@ -143,7 +147,7 @@ Seqx.max([5; 6; 7; 3; 1; 2])
 Seqx.min_max([5; 6; 7; 3; 1; 2]
 (1, 7)
 
-Seqx.filter([1; 2; 3], {(x: B): Bool => x %% 2 == 0})
+Seqx.filter([1; 2; 3], Num~is_enev())
 [2]
 
 Seqx.first([1; 2; 3; 4; 5; 6])
@@ -177,6 +181,9 @@ Seqx.sort([2; 3; 1])
 Seqx.sort_by(["some"; "kind"; "of"; "monster"], {(x: String): USize => x.size()})
 ["of"; "some"; "kind"; "monster"]
 
+Seqx.sort_by(["some"; "kind"; "of"; "monster"], Str~size())
+["of"; "some"; "kind"; "monster"]
+
 Seqx.shuffle([1; 2; 3; 4; 5])
 [3; 1; 4; 2; 5]
 
@@ -189,7 +196,7 @@ Seqx.rotation({1, 2, 3, 4, 5, 6, 7}, 2)
 
 *** Grouping
 #+BEGIN_SRC pony
-Seqx.chunk_by([1; 2; 2; 3; 4; 4; 6; 7; 7], {(x: I32): Bool => x%%2==1 })
+Seqx.chunk_by([1; 2; 2; 3; 4; 4; 6; 7; 7], Num.is_is_odd())
 [[1]; [2; 2]; [3]; [4; 4; 6]; [7; 7]]
 
 Seqx.chunk_every([1; 2; 3; 4; 5; 6], 2)
@@ -243,10 +250,10 @@ Seqx.join([1; 2; 3])
 Seqx.join([1; 2; 3], " = ")
 "1 = 2 = 3"
 
-Seqx.map_join([1; 2; 3], "", {(x: I32): I32 => x * 2})
+Seqx.map_join([1; 2; 3], "", Num~mul(2))
 "246"
 
-Seqx.map_join([1; 2; 3], " = ", {(x: I32): I32 => x * 2})
+Seqx.map_join([1; 2; 3], " = ", Num~mul(2))
 "2 = 4 = 6"
 #+END_SRC
 
@@ -255,10 +262,13 @@ Seqx.map_join([1; 2; 3], " = ", {(x: I32): I32 => x * 2})
 Seqx.sum([1; 2; 3])
 6
 
-Seqs.sum_by(["1"; "2"; "3"], {(a: String, b: String): String => a+":"+b})
+Seqs.sum_by(["1"; "2"; "3"], Str~join(":"))
 "1:2:3"
 
 Seqx.scan([1; 2; 3; 4; 5], {(prev: I32, curr: I32): I32 => prev+curr })
+[1; 3; 6; 10; 15]
+
+Seqx.scan([1; 2; 3; 4; 5], Num~add())
 [1; 3; 6; 10; 15]
 
 Seqx.reduce([1; 2; 3], 0, {(x: I32, acc: I32):I32 => x + acc})
@@ -286,7 +296,13 @@ Seqx.to_array({1, 2, 3})
 [1; 2; 3]
 
 Seqx.flat_map(['a', 'b', 'c'], {(x: U8): Array[Any] => [x; x]})
-['a', 'a', 'b', 'b', 'c', 'c']
+['a'; 'a'; 'b'; 'b'; 'c'; 'c']
+
+Seqx.flat_map(['a', 'b', 'c'], Num~copy())
+['a'; 'a'; 'b'; 'b'; 'c'; 'c']
+
+Seqx.flat_map(['a', 'b', 'c'], Num~copy(2))
+['a'; 'a'; 'a'; 'b'; 'b'; 'b'; 'c'; 'c'; 'c']
 
 Seqx.intersperse([1; 2; 3], 0)
 [1; 0; 2; 0; 3]
@@ -306,6 +322,22 @@ Seqx.unzip([("a", 1); ("b", 2); ("c", 3)])
 Seqx.unzip([["a"; 1]; ["b"; 2]; ["c"; 3}]])
 [["a"; "b"; "c"]; [1; 2; 3]]
 
+let m = Map[String, ISize]
+Seqs.into(["a"; 1; "b"; 2], m)
+<"a": 1, "b": 2>
+
+let m2 = Map[String, ISize]
+m2("b")= 2
+Seqs.into(%{a: 1}, m2)
+<"a": 1, "b": 2>
+
+let m3 = Map[String, ISize]
+Seqs.into(["a": 1, "a": 2], m3)
+<"a": 2>
+
+let set = Set[ISize]
+Seqs.into([1; 2], set)
+<1, 2>
 #+END_SRC
 
 *** More

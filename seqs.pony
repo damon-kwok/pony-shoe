@@ -48,6 +48,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Clone the `sequence`.
 
+    Example:
+
     ````pony
     Seqs.clone([1; 2; 3; 4; 5])
     [1; 2; 3; 4; 5]
@@ -61,6 +63,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun remove(a: A, i: USize) =>
     """
     Remove one element from `sequence` at the given index  (zero-based).
+
+    Example:
 
     ````pony
     Seqs.remove([1; 2; 3; 4; 5], 2)
@@ -78,6 +82,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun is_all(a: A, f: {(B): Bool} val): Bool =>
     """
     Returns true if fun.(element) is truthy for all elements in sequence.
+
+    Example:
 
     ````pony
     Seqs.is_all([2; 4; 6], {(x: U32): Bool => x %% 2 == 0})
@@ -99,6 +105,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns true if fun.(element) is truthy for at least one element in sequence.
 
+    Example:
+
     ````pony
     Seqs.is_any([2; 4; 6], {(x: U32): Bool => x %% 2 == 1})
     false
@@ -119,6 +127,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Determines if the sequence is empty.
 
+    Example:
+
     ````pony
     Seqs.is_empty([])
     true
@@ -132,6 +142,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun is_member(a: A, v: B): Bool =>
     """
     Checks if element exists within the `sequence`.
+
+    Example:
 
     ````pony
     Seqs.is_member([1; 2; 3; 4; 5; 6; 7; 8; 9; 10], 5)
@@ -160,6 +172,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   //   Returns the count of elements in the sequence for which fun returns a truthy
   //   value.
 
+  //   Example:
+
   //   ````pony
   //   Seqs.count([1; 2; 3])
   //   3
@@ -184,6 +198,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns the count of elements in the sequence for which fun returns a truthy
     value.
 
+    Example:
+
     ````pony
     Seqs.count([1; 2; 3])
     3
@@ -196,6 +212,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns the count of elements in the sequence for which fun returns a truthy
     value.
 
+    Example:
+
     ````pony
     Seqs.count_by([1; 2; 3; 4; 5], {(x: U32): Bool => x %% 2 == 0})
     2
@@ -203,13 +221,15 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     var n: USize = 0
     for e in a.values() do
-      if f'(e) then n = n + 1 end
+      if f(e) then n = n + 1 end
     end
     n
 
   fun first(a: A): B? =>
     """
     Extract the first element of a `sequence` (zero-based).
+
+    Example:
 
     ````pony
     Seqs.first([1; 2; 3; 4; 5])
@@ -222,6 +242,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Extract the first element of a `sequence` (zero-based).
 
+    Example:
+
     ````pony
     Seqs.second([1; 2; 3; 4; 5])
     2
@@ -232,6 +254,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun nth(a: A, index: ISize): B? =>
     """
     Extract the nth element of a `sequence` (zero-based).
+
+    Example:
 
     ````pony
     Seqs.nth([1; 2; 3; 4; 5], 3)
@@ -251,6 +275,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Extract the last element of a `sequence` (zero-based).
 
+    Example:
+
     ````pony
     Seqs.last([1; 2; 3; 4; 5])
     5
@@ -261,6 +287,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun head(a: A): A^ =>
     """
     Extract the first element of a `sequence` (zero-based).
+
+    Example:
 
     ````pony
     Seqs.head([1; 2; 3; 4; 5])
@@ -278,6 +306,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Extract the elements after the head of a sequence (zero-based).
 
+    Example:
+
     ````pony
     Seqs.tail([1; 2; 3; 4; 5])
     [2; 3; 4; 5]
@@ -293,6 +323,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun at(a: A, index: ISize, default: B): B =>
     """
     Finds the element at the given index (zero-based).
+
+    Example:
 
     ````pony
     Seqs.at([2; 4; 6], 0, -1)
@@ -315,6 +347,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Finds the element at the given index (zero-based).
 
+    Example:
+
     ````pony
     Seqs.fetch([2, 4, 6], 0)
     2
@@ -331,6 +365,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun random(a: A): B? =>
     """
     Returns a random element of a sequence.
+
+    Example:
 
     ````pony
     Seqs.random([1, 2, 3])
@@ -354,6 +390,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns the maximal element in the sequence.
 
+    Example:
+
     ````pony
     Seqs.max([1; 2; 3])
     3
@@ -364,6 +402,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun max_by(a: A, f_eval: {(B): USize} val): B? =>
     """
     Returns the maximal element in the sequence as calculated by the given fun.
+
+    Example:
 
     ````pony
     Seqs.max_by(["a"; "aa"; "aaa"], {(a: String, b: String): Bool => a.size() > b.size()})
@@ -379,6 +419,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns the minimal element in the sequence.
 
+    Example:
+
     ````pony
     Seqs.min([1; 2; 3])
     1
@@ -389,6 +431,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun min_by(a: A, f_eval: {(B): USize} val): B? =>
     """
     Returns the minimal element in the sequence as calculated by the given fun.
+
+    Example:
 
     ````pony
     Seqs.min_by(["aaa"; "bb"; "c"], {(x: String):USize => x.size()})
@@ -403,6 +447,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun min_max(a: A): (B, B)? =>
     """
     Returns a tuple with the minimal and the maximal elements in the sequence.
+
+    Example:
 
     ````pony
     Seqs.min_max([2; 3; 1])
@@ -424,6 +470,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns a tuple with the minimal and the maximal elements in the sequence
     as calculated by the given function.
+
+    Example:
 
     ````pony
     Seqs.min_max_by(["aaa"; "bb"; "c"], {(x: String):USize => x.size()})
@@ -453,6 +501,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Splits sequence on every element for which fun returns a new value.
 
+    Example:
+
     ````pony
     Seqs.chunk_by([1; 2; 2; 3; 4; 4; 6; 7; 7], {(x: U32): Bool => x%%2==1 })
     [[1]; [2; 2]; [3]; [4; 4; 6]; [7; 7]]
@@ -481,6 +531,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun chunk_every(a: A, n: USize): Array[A]^ =>
     """
     Shortcut to chunk_every(sequence, count, count).
+
+    Example:
 
     ````pony
     Seqs.chunk_every([1; 2; 3; 4; 5; 6], 2)
@@ -517,6 +569,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     `f_after` is invoked when iteration is done and must also return
     {:cont, chunk, acc} or {:cont, acc}.
 
+    Example:
+
     ````pony
     Seq.chunk_while(Num[U32].range_i(1,10), [], chunk_fun, after_fun)
     [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]
@@ -527,6 +581,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Splits the sequence into two sequences, leaving count elements in the
     first one.
+
+    Example:
 
     ````pony
     Seqs.split([1, 2, 3], 2)
@@ -563,6 +619,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Splits sequence in two at the position of the element for which fun
     returns a falsy value (false or nil) for the first time.
 
+    Example:
+
     ````pony
     Seqs.split_while([1; 2; 3; 4], {(x: U32): Bool => x<3})
     [[1; 2]; [3; 4]]
@@ -595,6 +653,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Splits the sequence in two lists according to the given function fun.
 
+    Example:
+
     ````pony
     Seqs.split_with([5; 4; 3; 2; 1; 0], {(x: U32): Bool => x%%2 == 0})
     {[4; 2; 0]; [5; 3; 1]}
@@ -615,6 +675,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun take(a: A, amount: ISize): A^ =>
     """
     Takes an amount of elements from the beginning or the end of the sequence.
+
+    Example:
 
     ````pony
     Seqs.take([1; 2; 3], 2)
@@ -643,6 +705,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns a sequence of every nth element in the sequence, starting with the
     first element.
 
+    Example:
+
     ````pony
     Seqs.take_every([1; 2; 3; 4; 5; 6; 7; 8; 9; 10], 2)
     [1; 3; 5; 7; 9]
@@ -665,6 +729,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun take_random(a: A, n: USize): A^ =>
     """
     Takes n random elements from sequence.
+
+    Example:
 
     ````pony
     Seqs[Array[U32], U32].take_random(Num[U32].range_i(1, 10), 2)
@@ -691,6 +757,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Takes the elements from the beginning of the sequence while fun returns a
     truthy value.
 
+    Example:
+
     ````pony
     Seqs.take_while([1; 2; 3; 4; 5; 1; 0;], {(B): Bool} => x<3))
     [1; 2]
@@ -707,6 +775,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun concat(arr: Array[A]): A^? =>
     """
     Given a sequence array, concatenates the sequences into a single sequence.
+
+    Example:
 
     ````pony
     Seqs.concat([[1; 2; 3]; [4; 5; 6]; [7; 8; 9])
@@ -730,6 +800,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Concatenates the sequence on the right with the sequence on the left.
 
+    Example:
+
     ````pony
     Seqs.merge([1; 2; 3], [4; 5; 6])
     [1; 2; 3; 4; 5; 6]
@@ -747,6 +819,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns the sum of all elements.
 
+    Example:
+
     ````pony
     Seqs[Array[I32], I32].sum([1; 2; 3])
     6
@@ -761,6 +835,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun sum_by(a: A, f_add: {(B, B): B} val): B? =>
     """
     Returns the sum of all elements.
+
+    Example:
 
     ````pony
     Seqs[Array[I32], I32].sum([1; 2; 3])
@@ -780,6 +856,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Traverse the sequence, removing all duplicated elements.
 
+    Example:
+
     ````pony
     Seqs.uniq([1, 5, 3, 3, 2, 3, 1, 5, 4])
     [1, 5, 3, 2, 4]
@@ -790,6 +868,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Traverse the sequence, by removing the elements for which function fun
     returned duplicate elements.
+
+    Example:
 
     ````pony
     Seqs[Array[(U32, String)], (U32, String)]
@@ -806,6 +886,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Traverse the sequence, returning a sequence where all consecutive
     duplicated elements are collapsed to a single element.
+
+    Example:
 
     ````pony
     Seqs[Array[U32], U32].dedup([1; 2; 3; 3; 2; 1])
@@ -833,6 +915,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Traverse the sequence, returning a sequence where all consecutive duplicated
     elements are collapsed to a single element.
 
+    Example:
+
     ````pony
     Seqs[Array[U32], U32].dedup_by([(1, "a"), (2, "b"), (2, "c"), (1, "a")], {(x: B): Any => x._1})
     [(1, "a"), (2, "b"), (1, "a")]
@@ -859,6 +943,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Drops the amount of elements from the sequence.
 
+    Example:
+
     ````pony
     Seqs.dedup_by([(1, "a"), (2, "b"), (2, "c"), (1, "a")], (x, _) -> x end)
     [(1, "a"), (2, "b"), (1, "a")]
@@ -877,6 +963,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun drop_tail(a: A, amount: USize): A^ =>
     """
     Drops the amount of elements from the sequence.
+
+    Example:
 
     ````pony
     Seqs.drop([1; 2; 3], 2)
@@ -904,6 +992,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns a sequence of every nth element in the sequence dropped,
     starting with the first element.
 
+    Example:
+
     ````pony
     Seqs[Array[U32], U32].drop_every([1; 2; 3; 4; 5; 6; 7; 8; 9; 10], 2)
     [2, 4, 6, 8, 10]
@@ -922,7 +1012,10 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   fun drop_while(a: A, f: {(B): Bool} val): A^ =>
     """
-    Drops elements at the beginning of the sequence while fun returns a truthy value.
+    Drops elements at the beginning of the sequence while fun returns a truthy
+    value.
+
+    Example:
 
     ````pony
     Seqs.drop_while([1; 2; 3; 2; 1], {(x: B): Bool => x < 3})
@@ -947,6 +1040,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Filters the sequence, i.e. returns only those elements for which fun
     returns a truthy value.
 
+    Example:
+
     ````pony
     Seqs[Array[U32], U32].filter([1; 2; 3], {(x: B): Bool => x %% 2 == 0})
     [2]
@@ -962,6 +1057,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns the first element for which fun returns a truthy value.
     If no such element is found, returns default.
+
+    Example:
 
     ````pony
     Seqs[Array[U32], U32].find([2; 3; 4], {(x: B): Bool => x %% 2 == 1}, 9)
@@ -980,6 +1077,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Similar to find, but returns the index (zero-based) of the element instead
     of the element itself.
+
+    Example:
 
     ````pony
     Seqs[Array[U32], U32].find_index([2; 4; 6], {(x: B): Bool => x %% 2 == 1})
@@ -1000,6 +1099,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Similar to find, but returns the value of the function invocation instead
     of the element itself.
+
+    Example:
 
     ````pony
     Seqs.find_value([2; 3; 4], {(x: U32): U32 =>  if x > 2 then x * x})
@@ -1024,6 +1125,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun join(a: A, joiner: String = "", f_str: ({(B): String} val | None) = None): String =>
     """
     Joins the given sequence into a binary using joiner as a separator.
+
+    Example:
 
     ````pony
     Seqs.join([1; 2; 3])
@@ -1059,6 +1162,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns a sequence where each element is the result of invoking fun on each
     corresponding element of sequence.
 
+    Example:
+
     ````pony
     Seqs.map([1; 2; 3], {(x: U32): U32 => x * 2})
     [2; 4; 6]
@@ -1067,14 +1172,11 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     [("a" -1); ("b" -2)]
     ````
     """
-    var i: USize = 0
-
-    for e in a.values() do
+    for i in Range[USize](0, a.size()) do
       match f
-        | let f': {(B): B} val => f'(e)
-        | let f': {(USize, B): B} val => f'(i, e)
+        | let f': {(B): B} val => try a(i)? = f'(a(i)?) end
+        | let f': {(USize, B): B} val => try a(i)? = f'(i, a(i)?) end
       end
-      i = i + 1
     end
     a
 
@@ -1082,6 +1184,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns a sequence of results of invoking fun on every nth' element of
     sequence, starting with the first element.
+
+    Example:
 
     ````pony
     Seqs.map_every([1..10], 2, {(x: U32): U32 => x + 1000})
@@ -1110,6 +1214,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Maps and intersperses the given sequence in one pass.
 
+    Example:
+
     ````pony
     Seqs[Array[(U32 | U8)], （(U32 | U8)].map_intersperse([1; 2; 3], 'a', {(x: U32): U32 => x * 2})
     [2; 'a'; 4; 'a'; 6]
@@ -1128,6 +1234,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun map_join(a: A, joiner: String, f_mapper: {(B): B} val, f_str: ({(B): String} val | None) = None): String =>
     """
     Maps and joins the given sequence in one pass.
+
+    Example:
 
     ````pony
     Seqs.map_join([1; 2; 3], "", {(x: U32): U32 => x * 2})
@@ -1156,6 +1264,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Invokes the given function to each element in the sequence to reduce
     it to a single element, while keeping an accumulator.
 
+    Example:
+
     ````pony
     map_reduce([1; 2; 3], 0, {(x: U32, acc: U32): U32 => (x * 2, x + acc)})
     ([2; 4; 6], 6)
@@ -1177,6 +1287,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Invokes fun for each element in the sequence with the accumulator.
 
+    Example:
+
     ````pony
     Seqs.reduce([1; 2; 3], 0, {(x: U32, acc: U32):U32 => x + acc})
     6
@@ -1196,6 +1308,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Reduces sequence until fun returns {:halt, term}.
 
+    Example:
+
     ````pony
     Seqs.reduce_while([1..100], 0, fn x, acc => if x < 5 then acc + x else acc})
     10
@@ -1210,6 +1324,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns a sequence of elements in sequence excluding those for which the
     function fun returns a truthy value.
 
+    Example:
+
     ````pony
     Seqs.reject([1; 2; 3], {(x:U32): U32 => x%%2 == 0})
     [1; 3]
@@ -1219,6 +1335,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun reverse(a: A): A^ =>
     """
     Returns a sequence of elements in sequence in reverse order.
+
+    Example:
 
     ````pony
     Seqs.reverse([1; 2; 3])
@@ -1235,6 +1353,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Reverses the sequence in the range from initial start_index through count
     elements.
 
+    Example:
+
     ````pony
     let arr = Num[U32].range_i(1, 10)
     Seqs.reverse_slice(arr, 5, 5)
@@ -1247,6 +1367,15 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   fun swap(a: A, i: USize, j: USize): A^ =>
     """
+    Swap two elements in a sequence.
+
+    Example:
+
+    ````pony
+    let arr = Num[U32].range_i(1, 5)
+    Seqs.swap(arr, 2, 3)
+    [1; 3; 2; 4; 5]
+    ````
     """
     try
       let tmp = a(i)?
@@ -1258,9 +1387,13 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   //============================================================================
   //Traverse
 
-  fun each(a: A, f: ({(B)} val | {(USize, B)} val)) =>
+  fun each(a: A,
+    f: ({(B)} val | {(B): B} val | {(USize, B)} val | {(USize, B): B} val)) : A^
+   =>
     """
-    Invokes the given fun for each element in the sequence.
+    Invokes the given function for each element in the sequence.
+
+    Example:
 
     ````pony
     Seqs.each(["some"; "example"], {(x: String) => env.out.print(x)})
@@ -1272,18 +1405,20 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     for e in a.values() do
       match f
         | let f': {(B)} val => f'(e)
-        | let f': {(USize, B)} val => i=i+1; f'(i, e)
+        | let f': {(B): B} val => f'(e)
+        | let f': {(USize, B)} val => f'(i, e); i=i+1
+        | let f': {(USize, B): B} val => f'(i, e); i=i+1
       end
-      // try (f as {(B)} val)(e) end
-      // try (f as {(USize, B)} val)(i ,e) end
-      // i = i+1
     end
+    a
 
   fun scan(a: A, f: ({(B, B): B} val | {(B, B, B): B} val)): A^ =>
     """
     Applies the given function to each element in the sequence, storing the
     result in a sequence and passing it as the accumulator for the next computation.
     Uses the first element in the sequence as the starting value.
+
+    Example:
 
     ````pony
     Seqs.scan([1; 2; 3; 4; 5], {(prev: U32, curr: U32): U32 => prev+curr })
@@ -1312,11 +1447,18 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   fun skip(a: A, interval: USize, f: ({(B)} val | {(USize, B)} val) ) =>
     """
+    Jump through the sequence, invokes the given function for the hit element.
+
+    Example:
+
+    ````pony
+    Seqs.skip(["a"; "b"; "c"], {(x: String) => env.out.print(x)})
+    "a"
+    "c"
+    ````
     """
     for i in Range[USize](0, a.size()) do
       if (i %% interval) == 0 then
-        // try (f as {(B)} val)(a(i)?) end
-        // try (f as {(USize, B)} val)(i, a(i)?) end
         match f
           | let f': {(B)} val => try f'(a(i)?) end
           | let f': {(USize, B)} val => try f'(i, a(i)?) end
@@ -1326,6 +1468,10 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   fun stair(a: A, f: ({(B)} val | {(USize, B)} val | {(USize, USize, B)} val) ) =>
     """
+    Invokes the given function for each element in the sequence. The first
+    element is called once, the second element is called twice, and so on.
+
+    Example:
 
     ````pony
     Seqs.stair(['a'; 'b'; 'c'], {(x: U32) => print(x)})
@@ -1337,8 +1483,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
       let str = (i+1).string() + "x" + (i+1).string() + "="
       let v= (i+1) * x
       Debug.out(str+v.string())
-      }
-      Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
+    }
+    Seqs.stair([1; 2; 3;], {(i: USize, x: U32) => output(i, x)})
       1x1=1
       1x2=2 2x2=4
       1x3=3 2x3=6 3x3=9
@@ -1346,9 +1492,6 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     for i in Range[USize](0, a.size()) do
       for j in Range[USize](0, i+1) do
-        // try (f as {(B)} val)(a(i)?) end
-        // try (f as {(USize, B)} val)(i, a(i)?) end
-        // try (f as {(USize, USize, B)} val)(i, j, a(i)?) end
         match f
           | let f': {(B)} val => try f'(a(i)?) end
           | let f': {(USize, B)} val => try f'(i, a(i)?) end
@@ -1359,20 +1502,26 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   fun table(cols: A, rows: A, f: ({(B, B)} val |{(USize, B, USize, B) } val) ) =>
     """
+    Example:
+
+    ````pony
+    ````
     """
     for col in Range[USize](0, cols.size()) do
       for row in Range[USize](0, rows.size()) do
-        // try (f as {(B, B)} val)(cols(col)?, rows(row)?) end
-        // try (f as {(USize, B, USize, B)} val)(col, cols(col)?, row, rows(row)?) end
         match f
          | let f': {(B, B)} val => try f'(cols(col)?, rows(row)?) end
          | let f': {(USize, B, USize, B)} val =>try f'(col, cols(col)?, row, rows(row)?) end
-       end
-    end
+        end
+      end
     end
 
   fun matix(arr: Array[A]): Array[A]^ =>
     """
+    Example:
+
+    ````pony
+    ````
     """
     arr
 
@@ -1384,6 +1533,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun slice_range(a: A, from: USize, to: USize): A^ =>
     """
     Returns a subset sequence of the given sequence by index_range.
+
+    Example:
 
     ````pony
     Seqs.slice_range([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 7)
@@ -1400,6 +1551,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Returns a subset sequence of the given sequence, from index (zero-based)
     with amount number of elements if available.
+
+    Example:
 
     ````pony
     Seqs.slice([0; 1; 2; 3; 4; 5; 6; 7; 8; 9], 5, 20)
@@ -1418,12 +1571,15 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
       try out.push(a(i)?) end
     end
     out
+    // a.slice(start, start + n + 1)
 
   //============================================================================
   // Sort
   fun sort(a: A): A^ =>
     """
     Sorts the sequence.
+
+    Example:
 
     ````pony
     Seqs.sort([2; 3; 1])
@@ -1437,6 +1593,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Sorts the sequence by the given function.
 
+    Example:
+
     ````pony
     Seqs.sort_by(["some"; "kind"; "of"; "monster"], {(a: String, b: String): Bool => a.size() > b.size()})
     ["of"; "some"; "kind"; "monster"]
@@ -1448,6 +1606,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun shuffle(a: A): A^ =>
     """
     Returns a sequence with the elements of sequence shuffled.
+
+    Example:
 
     ````pony
     Seqs.shuffle([1; 2; 3; 4; 5])
@@ -1466,6 +1626,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun rotation(a: A, n: USize): A^ =>
     """
     Returns a sequence with the elements of sequence shuffled.
+
+    Example:
 
     ````pony
     Seqs.rotation([1; 2; 3; 4; 5; 6; 7], 1)
@@ -1489,6 +1651,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Converts sequence to a list.
 
+    Example:
+
     ````pony
     Seqs.to_list([1; 2; 3])
     {1, 2, 3}
@@ -1506,6 +1670,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Converts sequence to a array.
 
+    Example:
+
     ````pony
     Seqs.to_array({1, 2, 3})
     [1; 2; 3]
@@ -1522,6 +1688,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     fun flat_map(a: A, f: {(B): Array[Any]} val) =>
     """
     Maps the given fun over sequence and flattens the result.
+
+    Example:
 
     ````pony
     Seqs.flat_map(['a', 'b', 'c'], {(x: U8): Array[Any] => [x; x]})
@@ -1542,12 +1710,19 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   // fun flat_map_reduce(a: A, acc, fn) =>
     // """
-    // Maps and reduces a sequence, flattening the given results (only one level deep).
+    // Maps and reduces a sequence, flattening the given results
+    // (only one level deep).
+
+    // Example:
+    // ````pony
+    // ````
     // """
 
   fun intersperse(a: A, x: B): A^ =>
     """
     Intersperses element between each element of the sequence.
+
+    Example:
 
     ````pony
     Seqs.intersperse([1; 2; 3], 0)
@@ -1580,6 +1755,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns the sequence with each element wrapped in a tuple alongside its
     index.
 
+    Example:
+
     ````pony
     Seqs[Array[String], String].with_index(["a"; "b"; "c"])
     [("a", 0); ("b", 1); ("c", 2)]
@@ -1594,24 +1771,87 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     end
     out
 
-  fun into(a: A, collectable: A) =>
+  fun to_tuple(a: A): Array[(B, B)]^ =>
     """
-    Inserts the given sequence into a collectable.
+
+    Example:
+
+    ````pony
+    ````
+    """
+    let out = Array[(B, B)]
+    var i: USize = 0
+    try
+    for e in a.values() do
+      if (i%%2)==0 then continue end
+        let tup = (a(i-1)? ,e)
+        out.push(tup)
+        // Collects[B, B].update(
+    end
+    end
+    out
+
+  fun _into_map(a: A, map': MapCollect[B, B] ref): MapCollect[B, B]^ =>
+    var i: USize = 0
+    try
+    for e in a.values() do
+      if (i%%2)==0 then continue end
+        map'(a(i-1)?) = e
+        i = i+1
+    end
+    end
+    map'
+
+  fun _into_set(a: A, set': SetCollect[B] ref): SetCollect[B]^ =>
+    for e in a.values() do
+      set'.set(e)
+    end
+    set'
+
+  fun into(a: A, collect: Collectable[B, B] ref): Collectable[B, B]^ =>
+    """
+    Inserts the given sequence into a collect.
+
+    Example:
 
     ````pony
     Seqs.into([1, 2], [])
     [1, 2]
 
-    Seqs.into(["a"; 1; "b"; 2], %{})
-    %{a: 1, b: 2}
+    let m = Map[String, ISize]
+    Seqs.into(["a"; 1; "b"; 2], m)
+    <"a": 1, "b": 2>
 
-    Seqs.into(%{a: 1}, %{b: 2})
-    %{a: 1, b: 2}
+    let m2 = Map[String, ISize]
+    m2("b")= 2
+    Seqs.into(%<a: 1>, m2)
+    <"a": 1, "b": 2>
 
-    Seqs.into([a: 1, a: 2], %{})
-    %{a: 2}
+    let m3 = Map[String, ISize]
+    Seqs.into(["a": 1, "a": 2], m3)
+    <"a": 2>
+
+    let set = Set[ISize]
+    Seqs.into([1; 2], set)
+    <1, 2>
     ````
     """
+    // Collects[B, B].from_array(collect, a)
+    // for e in array.values() do
+      // if (i%%2)==0 then continue end
+      // end
+      // collect.update()
+    // Collects[Collectable[B, B], B].from_array(collect, a)
+    // match collect
+      // match a
+        // | let a': MapCollect[B!, B!] => 1
+        // | let a': SetCollect[(K! | V!)] => 2
+        // end
+    match collect
+      | let map': MapCollect[B, B] => _into_map(a, map')
+      | let set': SetCollect[B] => _into_set(a, set')
+    end
+    collect
 
   // fun into(a: A, collectable, transform) =>
     // """
@@ -1632,6 +1872,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Returns a map with keys as unique elements of sequence and values as the
     count of every element.
 
+    Example:
+
     ````pony
     let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
     Seqs.frequencies(arr)
@@ -1645,7 +1887,10 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   fun frequencies_by(a: A, f_key: {(B): B} val ): AnyMap[B, USize] =>
     """
-    Returns a map with keys as unique elements given by key_fun and values as the count of every element.
+    Returns a map with keys as unique elements given by key_fun and values as
+    the count of every element.
+
+    Example:
 
     ````pony
     let arr = Str.split("ant buffalo ant ant buffalo dingo", " ")
@@ -1663,6 +1908,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
   fun group_by(a: A, f_k: {(B): B} val, f_v: {(B): B} val): AnyMap[B, A]^ =>
     """
     Splits the sequence into groups based on key_fun.
+
+    Example:
 
     ````pony
     let arr = Str.split("ant buffalo cat dingo"," ")
@@ -1689,6 +1936,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Opposite of zip2. Extracts two-element tuples from the given sequence and
     groups them together.
 
+    Example:
+
     ````pony
     Seqs[Array[(String, U32)], (String, U32)].unzip([("a", 1); ("b", 2); ("c", 3)])
     [["a"; "b"; "c"]; [1; 2; 3]]
@@ -1705,6 +1954,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     Zips corresponding elements from a finite collection of sequences into one
     sequence of tuples.
 
+    Example:
+
     ````pony
     Seqs.zip([[1; 2; 3]; ['a'; 'b'; 'c']; ["foo"; "bar"; "baz"]])
     [(1, 'a', "foo"); (2, 'b', "bar"); (3, 'c', "baz")]
@@ -1718,6 +1969,8 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
     """
     Zips corresponding elements from two sequences into one sequence of tuples.
 
+    Example:
+
     ````pony
     Seqs.zip([1, 2, 3], ['a', 'b', 'c'])
     [(1, 'a'), (2, 'b'), (3, 'c')]
@@ -1726,30 +1979,31 @@ interface _Sequence[A: Seq[B] ref, B: Comparable[B] #read]
 
   // Debug
   fun typeof(a: A): SeqType =>
-    """
-    Return `sequence` type enum value.
-    """
     iftype A <: List[B] then
       return ListType
-    end
-    iftype A <: Array[B] then
+    elseif A <: Array[B] then
       return ArrayType
-    end
-    iftype A <: String then
+    elseif A <: String then
       return StringType
+    else
+      UnknowType
     end
-    UnknowType
 
   fun trace(a: A, env: Env, f: ({(B): String} val | None) = None) =>
     """
     Print `sequence` debug info.
+
+    Example:
+
+    ````pony
+    ````
     """
     let t = typeof(a)
     var out = "[Trace] "
     var joiner = ","
     match t
       | ListType =>
-        joiner = ","
+        joiner = ";"
         out = out + "List => size:"+a.size().string() + " {"
       | ArrayType =>
         joiner = ";"
