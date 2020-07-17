@@ -5,11 +5,11 @@
 
 # Summary
 
-Add a `AnyMap` primitive to `collections` package.
+Add a `AnyMap` and`AnySet`to `collections` package.
 
 # Motivation
 
-`AnyMap` primitive like `Map`, but it use a `lambda` for hash calculation. it can use the any type for Key.
+`AnyMap` like `Map`, but it use a `lambda` for hash calculation. it can use the any type for Key.
 
 # Detailed design
 
@@ -30,7 +30,7 @@ actor Main
     let map2 = AnyMap[U8, String](object is HashFunction[U8]
       fun hash(x: U8): USize => ...
       fun eq(x: U8, y: U8): Bool => ...
-  end)
+    end)
 ````
 
 # How We Test This
