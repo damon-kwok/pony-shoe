@@ -58,20 +58,20 @@ primitive SortBy[A: Seq[B] ref = Array[String], B: Any #read = String]
   actor Main
     new create(env:Env) =>
       let array = [ "aa"; "aaa"; "a" ]
-      SortBy(array, {(x: String):USize => x.size()})
+      SortBy(array, {(x: String):USize => x.size().u64 })
       for e in array.values() do
         env.out.print(e) // prints "a \n aa \n aaa"
       end
   ```
   """
-  fun apply(a: A, f: {(B): USize} val): A^ =>
+  fun apply(a: A, f: {(B): U64} val): A^ =>
     """
     Sort the given seq.
     """
     try _sort(a, 0, a.size().isize() - 1, f)? end
     a
 
-  fun _sort(a: A, lo: ISize, hi: ISize, f: {(B): USize} val) ? =>
+  fun _sort(a: A, lo: ISize, hi: ISize, f: {(B): U64} val) ? =>
     if hi <= lo then return end
     // choose outermost elements as pivots
     if f(a(lo.usize())?) > f(a(hi.usize())?) then _swap(a, lo, hi)? end
